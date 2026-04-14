@@ -1,0 +1,24 @@
+# Binaries
+adapto
+adapto-cms-cli
+*.exe
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+vendor/
+
+# Downloaded spec (regenerate from source)
+openapi.json
+
+# Claude
+.claude/
