@@ -35,11 +35,8 @@ All variables can also be passed as flags: `--token`, `--api-url`, `--tenant-id`
 ## Quick Start
 
 ```bash
-# Login and get a token
+# Login (credentials are saved automatically)
 adapto auth login --email you@example.com --password yourpassword
-
-# Set the token
-export ADAPTO_TOKEN=<access_token from login>
 
 # List articles
 adapto articles list

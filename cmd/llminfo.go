@@ -217,6 +217,7 @@ Create an article.
 | ` + "`--status`" + ` | Status (draft/published) |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON (default: {"type":"internal","name":"CLI"}) |
+| ` + "`--media-json`" + ` | Media objects placements JSON array (see Media Objects section) |
 
 ` + "```" + `
 adapto articles create --title "Hello World" --content "<p>Body</p>" --slug hello-world --author "Jane" --language en
@@ -242,6 +243,7 @@ Update an article. Only provided flags are changed.
 | ` + "`--status`" + ` | Status |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 #### adapto articles delete <id>
 Delete an article.
@@ -268,6 +270,7 @@ Create a translation of an existing article.
 | ` + "`--summary`" + ` | Summary |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 #### adapto articles categories <id>
 List category IDs associated with an article.
@@ -422,6 +425,7 @@ Create a collection item.
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--data-json`" + ` | Item data JSON (required) |
 | ` + "`--status`" + ` | Status |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 ` + "```" + `
 adapto collections items create abc123 --title "My Item" --slug my-item --language en --data-json '{"field1":"value1"}'
@@ -450,6 +454,7 @@ Update a collection item. Only provided flags are changed.
 | ` + "`--language`" + ` | Language code |
 | ` + "`--data-json`" + ` | Item data JSON |
 | ` + "`--status`" + ` | Status |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 #### adapto collections items delete <collection_id> <item_id>
 Delete a collection item.
@@ -473,6 +478,7 @@ Create a translation of a collection item.
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--data-json`" + ` | Item data JSON (required) |
 | ` + "`--status`" + ` | Status |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 ---
 
@@ -507,6 +513,7 @@ Create a page.
 | ` + "`--parent-id`" + ` | Parent page ID |
 | ` + "`--status`" + ` | Status |
 | ` + "`--tags`" + ` | Comma-separated tags |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 #### adapto pages get <id>
 Get a page by ID.
@@ -527,6 +534,7 @@ Update a page. Only provided flags are changed.
 | ` + "`--language`" + ` | Language code |
 | ` + "`--status`" + ` | Status |
 | ` + "`--tags`" + ` | Comma-separated tags |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 #### adapto pages delete <id>
 Delete a page.
@@ -552,6 +560,7 @@ Create a page translation.
 | ` + "`--menu-label`" + ` | Menu label |
 | ` + "`--parent-id`" + ` | Parent page ID |
 | ` + "`--tags`" + ` | Comma-separated tags |
+| ` + "`--media-json`" + ` | Media objects placements JSON array |
 
 ---
 
@@ -583,10 +592,22 @@ Create file metadata (before uploading content).
 | ` + "`--tags`" + ` | Comma-separated tags |
 
 #### adapto files upload <filepath>
-Upload a file directly. Currently delegates to create-metadata + upload-by-id workflow.
+Upload a file directly. Creates metadata and uploads in one step via multipart/form-data. Returns the full file record including URL.
+
+| Flag | Description |
+|------|-------------|
+| ` + "`--tags`" + ` | Comma-separated tags |
+
+` + "```" + `
+adapto files upload ./photo.jpg
+` + "```" + `
 
 #### adapto files upload-by-id <file_id> <filepath>
-Upload file content for an existing file record. Outputs a curl command for the actual upload.
+Upload file content for an existing file record via multipart/form-data.
+
+` + "```" + `
+adapto files upload-by-id FILE_ID ./photo.jpg
+` + "```" + `
 
 #### adapto files get <id>
 Get file info by ID.
@@ -793,18 +814,36 @@ adapto microcopy create-translation SOURCE_ID --key "nav.home" --value "Accueil"
 adapto microcopy get-by-language fr
 ` + "```" + `
 
-### 7. File management
+### 7. File upload
 
 ` + "```bash" + `
+# Upload a file in one step (creates metadata + uploads content)
+adapto files upload ./photo.jpg
+
+# Or two-step: create metadata first, then upload by ID
+adapto files create-metadata --filename photo.jpg --content-type image/jpeg
+adapto files upload-by-id FILE_ID ./photo.jpg
+
 # List files
 adapto files list --type image --limit 10
-
-# Create file metadata, then upload via curl
-adapto files create-metadata --filename photo.jpg --content-type image/jpeg
-# Use the returned file ID with curl to upload the actual file content
 ` + "```" + `
 
-### 8. JSON output for scripting
+### 8. Media objects placements
+
+Articles, pages, and collection items support ` + "`--media-json`" + ` to attach media (images, videos, embeds). The flag accepts a JSON array of placement objects:
+
+` + "```bash" + `
+adapto articles create \
+  --title "My Post" --content "<p>Hello</p>" --slug my-post --author "Jane" --language en \
+  --media-json '[{"placement_key":"hero_image","media_object":{"id":"m1","file_id":"FILE_ID","url":"https://cdn.example.com/photo.jpg","type":"image"},"alt_text":"Hero image"}]'
+` + "```" + `
+
+Each placement object has:
+- ` + "`placement_key`" + ` (string) — where the media goes (e.g. "hero_image", "body_image_1")
+- ` + "`media_object`" + ` (object) — id, file_id, url, type (image/video/audio/document/other/youtube/vimeo/tiktok/instagram_reel/instagram_post), title, description
+- ` + "`caption`" + ` (string|null), ` + "`alt_text`" + ` (string|null), ` + "`meta_data`" + ` (string|null)
+
+### 9. JSON output for scripting
 
 ` + "```bash" + `
 # Get article as JSON for piping

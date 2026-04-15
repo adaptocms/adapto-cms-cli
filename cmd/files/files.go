@@ -1,8 +1,14 @@
 package files
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime"
+	"mime/multipart"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/eggnita/adapto_cms_cli/internal/client"
@@ -135,22 +141,30 @@ var uploadCmd = &cobra.Command{
 	Long:  "Upload a file directly. Creates metadata and uploads in one step.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		tags, _ := cmd.Flags().GetString("tags")
-
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
 			return err
 		}
 
-		body := client.BodyUploadFileManageFilesPost{}
-		// File upload requires multipart form - use raw body
-		_ = body
-		_ = tags
-		_ = c
+		body, contentType, err := buildMultipartBody(args[0])
+		if err != nil {
+			return err
+		}
 
-		// For file upload, we need to use the raw HTTP client approach
-		// because oapi-codegen's File type needs special handling
-		return fmt.Errorf("file upload requires using: adapto files create-metadata + adapto files upload-by-id <file_id> <filepath>")
+		resp, err := c.UploadFileManageFilesPostWithBodyWithResponse(cmdutil.Ctx(), &client.UploadFileManageFilesPostParams{}, contentType, body)
+		if err != nil {
+			return err
+		}
+		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+			return err
+		}
+
+		if resp.JSON201 != nil {
+			output.Print(resp.JSON201, func(d interface{}) {
+				printFile(resp.JSON201)
+			})
+		}
+		return nil
 	},
 }
 
@@ -159,9 +173,30 @@ var uploadByIDCmd = &cobra.Command{
 	Short: "Upload file content for an existing file record",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// File upload needs multipart/form-data with raw HTTP
-		return fmt.Errorf("file upload via CLI uses multipart HTTP - use curl or the SDK for now:\n  curl -X POST %s/manage/files/%s/upload -H 'Authorization: Bearer $ADAPTO_TOKEN' -F 'file=@%s'",
-			"$ADAPTO_API_URL", args[0], args[1])
+		c, _, err := cmdutil.NewClientWithAuth()
+		if err != nil {
+			return err
+		}
+
+		body, contentType, err := buildMultipartBody(args[1])
+		if err != nil {
+			return err
+		}
+
+		resp, err := c.UploadFileByIdManageFilesFileIdUploadPostWithBodyWithResponse(cmdutil.Ctx(), args[0], &client.UploadFileByIdManageFilesFileIdUploadPostParams{}, contentType, body)
+		if err != nil {
+			return err
+		}
+		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+			return err
+		}
+
+		if resp.JSON200 != nil {
+			output.Print(resp.JSON200, func(d interface{}) {
+				printFile(resp.JSON200)
+			})
+		}
+		return nil
 	},
 }
 
@@ -343,6 +378,36 @@ var multipartAbortCmd = &cobra.Command{
 		output.Success("Multipart upload aborted.")
 		return nil
 	},
+}
+
+// buildMultipartBody creates a multipart/form-data body with the file content.
+func buildMultipartBody(filePath string) (io.Reader, string, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, "", fmt.Errorf("cannot open file: %w", err)
+	}
+	defer f.Close()
+
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+
+	ct := mime.TypeByExtension(filepath.Ext(filePath))
+	if ct == "" {
+		ct = "application/octet-stream"
+	}
+
+	part, err := w.CreateFormFile("file", filepath.Base(filePath))
+	if err != nil {
+		return nil, "", err
+	}
+	if _, err := io.Copy(part, f); err != nil {
+		return nil, "", err
+	}
+	if err := w.Close(); err != nil {
+		return nil, "", err
+	}
+
+	return &buf, w.FormDataContentType(), nil
 }
 
 func printFile(f *client.FileResponseModel) {

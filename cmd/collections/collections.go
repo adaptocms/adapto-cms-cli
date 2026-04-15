@@ -375,6 +375,13 @@ var itemsCreateCmd = &cobra.Command{
 			s := client.CustomCollectionItemStatus(status)
 			body.Status = &s
 		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
+		}
 
 		resp, err := c.CreateItemManageCustomCollectionsCollectionIdItemsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreateItemManageCustomCollectionsCollectionIdItemsPostParams{}, body)
 		if err != nil {
@@ -511,6 +518,13 @@ var itemsUpdateCmd = &cobra.Command{
 				return fmt.Errorf("invalid --data-json: %w", err)
 			}
 			body.Data = &data
+		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
 		}
 
 		resp, err := c.UpdateItemManageCustomCollectionsCollectionIdItemsItemIdPutWithResponse(cmdutil.Ctx(), args[0], args[1], &client.UpdateItemManageCustomCollectionsCollectionIdItemsItemIdPutParams{}, body)
@@ -674,6 +688,13 @@ var itemsCreateTranslationCmd = &cobra.Command{
 			s := client.CustomCollectionItemStatus(status)
 			body.Status = &s
 		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
+		}
 
 		resp, err := c.CreateItemTranslationManageCustomCollectionsCollectionIdItemsSourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], args[1], &client.CreateItemTranslationManageCustomCollectionsCollectionIdItemsSourceIdTranslationsPostParams{}, body)
 		if err != nil {
@@ -753,6 +774,7 @@ func init() {
 		c.Flags().String("data-json", "", "Item data JSON")
 		c.Flags().String("language", "", "Language code")
 		c.Flags().String("status", "", "Status")
+		c.Flags().String("media-json", "", "Media objects placements JSON array")
 	}
 
 	// Items update flags
@@ -761,6 +783,7 @@ func init() {
 	itemsUpdateCmd.Flags().String("data-json", "", "Item data JSON")
 	itemsUpdateCmd.Flags().String("language", "", "Language code")
 	itemsUpdateCmd.Flags().String("status", "", "Status")
+	itemsUpdateCmd.Flags().String("media-json", "", "Media objects placements JSON array")
 
 	// Items batch create
 	itemsCreateBatchCmd.Flags().String("items-json", "", "Batch items JSON")

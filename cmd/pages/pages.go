@@ -1,6 +1,7 @@
 package pages
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -117,6 +118,13 @@ var createCmd = &cobra.Command{
 			s := client.PageStatus(status)
 			body.Status = &s
 		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
+		}
 
 		resp, err := c.CreatePageManagePagesPostWithResponse(cmdutil.Ctx(), &client.CreatePageManagePagesPostParams{}, body)
 		if err != nil {
@@ -224,6 +232,13 @@ var updateCmd = &cobra.Command{
 		}
 		if v, _ := cmd.Flags().GetString("tags"); v != "" {
 			body.Tags = cmdutil.StringSlicePtr(v)
+		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
 		}
 
 		resp, err := c.UpdatePageManagePagesPageIdPutWithResponse(cmdutil.Ctx(), args[0], &client.UpdatePageManagePagesPageIdPutParams{}, body)
@@ -386,6 +401,13 @@ var createTranslationCmd = &cobra.Command{
 			ParentId:  cmdutil.StringPtr(parentID),
 			Tags:      cmdutil.StringSlicePtr(tags),
 		}
+		if v, _ := cmd.Flags().GetString("media-json"); v != "" {
+			var placements []map[string]interface{}
+			if err := json.Unmarshal([]byte(v), &placements); err != nil {
+				return fmt.Errorf("invalid --media-json: %w", err)
+			}
+			body.MediaObjectsPlacements = &placements
+		}
 
 		resp, err := c.CreatePageTranslationManagePagesSourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreatePageTranslationManagePagesSourceIdTranslationsPostParams{}, body)
 		if err != nil {
@@ -441,6 +463,7 @@ func init() {
 		c.Flags().String("language", "", "Language code")
 		c.Flags().String("status", "", "Status")
 		c.Flags().String("tags", "", "Comma-separated tags")
+		c.Flags().String("media-json", "", "Media objects placements JSON array")
 	}
 
 	updateCmd.Flags().String("title", "", "Page title")
@@ -451,4 +474,5 @@ func init() {
 	updateCmd.Flags().String("language", "", "Language code")
 	updateCmd.Flags().String("status", "", "Status")
 	updateCmd.Flags().String("tags", "", "Comma-separated tags")
+	updateCmd.Flags().String("media-json", "", "Media objects placements JSON array")
 }
