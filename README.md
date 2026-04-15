@@ -56,6 +56,49 @@ adapto articles create \
   --language "en"
 ```
 
+## File Upload
+
+Upload files directly from the CLI:
+
+```bash
+# Single-step upload (creates metadata + uploads content)
+adapto files upload ./photo.jpg
+
+# Two-step: create metadata first, then upload by ID
+adapto files create-metadata --filename photo.jpg --content-type image/jpeg
+adapto files upload-by-id FILE_ID ./photo.jpg
+```
+
+## Media Objects
+
+Articles, pages, and collection items support attaching media (images, videos, embeds) via the `--media-json` flag on create, update, and create-translation commands:
+
+```bash
+adapto articles create \
+  --title "My Post" \
+  --content "<p>Hello</p>" \
+  --slug my-post \
+  --author "Jane" \
+  --language en \
+  --media-json '[{
+    "placement_key": "hero_image",
+    "media_object": {
+      "id": "m1",
+      "file_id": "FILE_ID",
+      "url": "https://cdn.example.com/photo.jpg",
+      "type": "image"
+    },
+    "alt_text": "Hero image"
+  }]'
+```
+
+Each placement object supports:
+- `placement_key` — where the media goes (e.g. `hero_image`, `body_image_1`)
+- `media_object` — `id`, `file_id`, `url`, `type` (image/video/audio/document/other/youtube/vimeo/tiktok/instagram_reel/instagram_post), `title`, `description`
+- `caption`, `alt_text`, `meta_data` — optional metadata
+
+The same `--media-json` flag works on `adapto pages create/update` and `adapto collections items create/update`.
+
 ## Commands
 
 ```
@@ -148,9 +191,7 @@ make generate
 
 ## Releasing
 
-The release workflow is automated via GitHub Actions. When a `v*` tag is pushed, binaries are built for all platforms and published to [GitHub Releases](https://github.com/eggnita/adapto_cms_cli/releases).
-
-Use `make release` to bump the version, create the tag, and push:
+Every push to `main` automatically bumps the patch version and creates a release. For intentional minor/major bumps, use `make release`:
 
 ```bash
 make release              # patch bump (v0.1.0 → v0.1.1)
@@ -158,7 +199,7 @@ make release BUMP=minor   # minor bump (v0.1.1 → v0.2.0)
 make release BUMP=major   # major bump (v0.2.0 → v1.0.0)
 ```
 
-This creates the git tag and pushes it, which triggers the CI to build and publish:
+Releases are built for all platforms and published to [GitHub Releases](https://github.com/eggnita/adapto_cms_cli/releases):
 - `adapto-linux-amd64`
 - `adapto-linux-arm64`
 - `adapto-darwin-amd64`
