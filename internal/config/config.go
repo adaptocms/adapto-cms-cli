@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/eggnita/adapto_cms_cli/internal/credentials"
+	"github.com/adaptocms/adapto-cms-cli/internal/credentials"
 	"github.com/spf13/viper"
 )
 

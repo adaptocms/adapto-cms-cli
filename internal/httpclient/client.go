@@ -7,8 +7,8 @@ import (
 	"net/http/httputil"
 	"os"
 
-	"github.com/eggnita/adapto_cms_cli/internal/client"
-	"github.com/eggnita/adapto_cms_cli/internal/config"
+	"github.com/adaptocms/adapto-cms-cli/internal/client"
+	"github.com/adaptocms/adapto-cms-cli/internal/config"
 )
 
 // New creates a ClientWithResponses that injects Bearer token and X-Tenant-ID headers.
