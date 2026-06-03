@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eggnita/adapto_cms_cli/internal/client"
-	"github.com/eggnita/adapto_cms_cli/internal/cmdutil"
-	"github.com/eggnita/adapto_cms_cli/internal/output"
-	"github.com/eggnita/adapto_cms_cli/internal/prompt"
+	"github.com/adaptocms/adapto-cms-cli/internal/client"
+	"github.com/adaptocms/adapto-cms-cli/internal/cmdutil"
+	"github.com/adaptocms/adapto-cms-cli/internal/output"
+	"github.com/adaptocms/adapto-cms-cli/internal/prompt"
 	"github.com/spf13/cobra"
 )
 

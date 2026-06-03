@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="eggnita/adapto_cms_cli"
+REPO="adaptocms/adapto-cms-cli"
 BINARY="adapto"
 INSTALL_DIR="/usr/local/bin"
 

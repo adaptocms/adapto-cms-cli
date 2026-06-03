@@ -3,13 +3,13 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/eggnita/adapto_cms_cli/cmd/articles"
-	"github.com/eggnita/adapto_cms_cli/cmd/auth"
-	"github.com/eggnita/adapto_cms_cli/cmd/categories"
-	"github.com/eggnita/adapto_cms_cli/cmd/collections"
-	"github.com/eggnita/adapto_cms_cli/cmd/files"
-	"github.com/eggnita/adapto_cms_cli/cmd/microcopy"
-	"github.com/eggnita/adapto_cms_cli/cmd/status"
+	"github.com/adaptocms/adapto-cms-cli/cmd/articles"
+	"github.com/adaptocms/adapto-cms-cli/cmd/auth"
+	"github.com/adaptocms/adapto-cms-cli/cmd/categories"
+	"github.com/adaptocms/adapto-cms-cli/cmd/collections"
+	"github.com/adaptocms/adapto-cms-cli/cmd/files"
+	"github.com/adaptocms/adapto-cms-cli/cmd/microcopy"
+	"github.com/adaptocms/adapto-cms-cli/cmd/status"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

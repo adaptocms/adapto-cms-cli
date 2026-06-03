@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eggnita/adapto_cms_cli/internal/client"
-	"github.com/eggnita/adapto_cms_cli/internal/config"
-	apierrors "github.com/eggnita/adapto_cms_cli/internal/errors"
-	"github.com/eggnita/adapto_cms_cli/internal/httpclient"
+	"github.com/adaptocms/adapto-cms-cli/internal/client"
+	"github.com/adaptocms/adapto-cms-cli/internal/config"
+	apierrors "github.com/adaptocms/adapto-cms-cli/internal/errors"
+	"github.com/adaptocms/adapto-cms-cli/internal/httpclient"
 	"github.com/spf13/cobra"
 )
 

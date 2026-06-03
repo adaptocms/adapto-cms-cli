@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/eggnita/adapto_cms_cli/cmd"
+	"github.com/adaptocms/adapto-cms-cli/cmd"
 )
 
 // Version is set via ldflags at build time.
