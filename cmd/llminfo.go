@@ -28,7 +28,10 @@ Adapto CMS CLI (` + "`adapto`" + `) is a command-line interface for the Adapto C
 ## Authentication
 
 ### Credential storage
-After ` + "`adapto auth login`" + `, tokens are saved to ` + "`~/.adapto/credentials.json`" + `. Subsequent commands read from this file automatically.
+After ` + "`adapto auth login`" + `, tokens are saved to ` + "`~/.config/adapto/credentials.json`" + `. Subsequent commands read from this file automatically.
+
+### Automatic token refresh
+The access token is short-lived. When a request fails with 401 and the active token came from the credentials file, the CLI automatically refreshes it using the stored refresh token, persists the rotated pair, and retries the request once — so you rarely need ` + "`adapto auth refresh`" + ` manually. If the refresh token itself has expired, the command fails with "session expired — run 'adapto auth login'". Tokens supplied via ` + "`--token`" + `/` + "`ADAPTO_TOKEN`" + ` are never auto-refreshed.
 
 ### Environment variables
 | Variable | Purpose |
@@ -218,6 +221,7 @@ Create an article.
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON (default: {"type":"internal","name":"CLI"}) |
 | ` + "`--media-json`" + ` | Media objects placements JSON array (see Media Objects section) |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 ` + "```" + `
 adapto articles create --title "Hello World" --content "<p>Body</p>" --slug hello-world --author "Jane" --language en
@@ -244,6 +248,7 @@ Update an article. Only provided flags are changed.
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON |
 | ` + "`--media-json`" + ` | Media objects placements JSON array |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto articles delete <id>
 Delete an article.
@@ -271,6 +276,7 @@ Create a translation of an existing article.
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--source`" + ` | Source JSON |
 | ` + "`--media-json`" + ` | Media objects placements JSON array |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto articles categories <id>
 List category IDs associated with an article.
@@ -304,6 +310,7 @@ Create a category.
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--description`" + ` | Category description |
 | ` + "`--parent-id`" + ` | Parent category ID |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto categories get <id>
 Get a category by ID.
@@ -321,6 +328,7 @@ Update a category. Only provided flags are changed.
 | ` + "`--description`" + ` | Category description |
 | ` + "`--parent-id`" + ` | Parent category ID |
 | ` + "`--language`" + ` | Language code |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto categories delete <id>
 Delete a category.
@@ -350,6 +358,7 @@ Create a category translation.
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--description`" + ` | Category description |
 | ` + "`--parent-id`" + ` | Parent category ID |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 ---
 
@@ -514,6 +523,7 @@ Create a page.
 | ` + "`--status`" + ` | Status |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--media-json`" + ` | Media objects placements JSON array |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto pages get <id>
 Get a page by ID.
@@ -535,6 +545,7 @@ Update a page. Only provided flags are changed.
 | ` + "`--status`" + ` | Status |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--media-json`" + ` | Media objects placements JSON array |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto pages delete <id>
 Delete a page.
@@ -561,6 +572,7 @@ Create a page translation.
 | ` + "`--parent-id`" + ` | Parent page ID |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--media-json`" + ` | Media objects placements JSON array |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 ---
 
@@ -671,6 +683,7 @@ Create a micro copy entry.
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--tags`" + ` | Comma-separated tags |
 | ` + "`--translation-of`" + ` | Source micro copy ID (links as translation) |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto microcopy get <id>
 Get micro copy by ID.
@@ -694,6 +707,7 @@ Update a micro copy entry.
 | ` + "`--value`" + ` | Text value |
 | ` + "`--language`" + ` | Language code |
 | ` + "`--tags`" + ` | Tags |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 #### adapto microcopy delete <id>
 Delete a micro copy entry.
@@ -710,6 +724,7 @@ Create a micro copy translation.
 | ` + "`--value`" + ` | Text value (required) |
 | ` + "`--language`" + ` | Language code (required) |
 | ` + "`--tags`" + ` | Comma-separated tags |
+| ` + "`--custom-fields-json`" + ` | Custom fields JSON object (see Custom Fields section) |
 
 ---
 
@@ -719,6 +734,32 @@ Check API status. Running ` + "`adapto status`" + ` directly returns the API hea
 
 #### adapto status version
 Get API version info.
+
+---
+
+## Custom Fields
+
+Articles, categories, pages, and micro copy support arbitrary typed metadata via the ` + "`--custom-fields-json`" + ` flag on their ` + "`create`" + `, ` + "`update`" + `, and ` + "`create-translation`" + ` commands. The flag takes a JSON object mapping each field name to a field definition:
+
+` + "```bash" + `
+adapto articles update ARTICLE_ID --custom-fields-json '{
+  "seo_title": {"type": "text", "value": "Welcome"},
+  "read_time": {"type": "number", "value": 5},
+  "related_posts": {"type": "reference", "multiple": true, "related_collection": "posts", "value": ["id1", "id2"]}
+}'
+` + "```" + `
+
+Each field definition has:
+- ` + "`type`" + ` (string, required) — one of: ` + "`text`" + `, ` + "`textarea`" + `, ` + "`number`" + `, ` + "`date`" + `, ` + "`date_range`" + `, ` + "`boolean`" + `, ` + "`reference`" + `, ` + "`image`" + `, ` + "`file`" + `, ` + "`url`" + `, ` + "`email`" + `, ` + "`color`" + `, ` + "`rich_text`" + `
+- ` + "`value`" + ` — the field value; its JSON type should match ` + "`type`" + ` (string, number, boolean, or an array when ` + "`multiple`" + ` is true)
+- ` + "`multiple`" + ` (bool, optional, default false) — whether ` + "`value`" + ` is a list
+- ` + "`related_collection`" + ` (string, optional) — for ` + "`reference`" + ` fields, the related collection ID
+- ` + "`media_objects_placements`" + ` (array, optional) — media placements for ` + "`rich_text`" + ` fields (same shape as ` + "`--media-json`" + `)
+
+Notes:
+- On ` + "`update`" + ` the supplied object **replaces the entire custom-fields map** — include every field you want to keep.
+- Unknown keys inside a field definition are rejected so the payload matches the API contract exactly.
+- For ` + "`file`" + `/` + "`image`" + ` fields, set ` + "`value`" + ` to a file ID; responses include a ` + "`file_urls`" + ` map resolving those IDs to URLs.
 
 ---
 

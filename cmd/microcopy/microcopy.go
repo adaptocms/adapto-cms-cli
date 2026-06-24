@@ -129,6 +129,12 @@ var createCmd = &cobra.Command{
 			Tags:          cmdutil.StringPtr(tags),
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateMicroCopyManageMicroCopyPostWithResponse(cmdutil.Ctx(), &client.CreateMicroCopyManageMicroCopyPostParams{}, body)
 		if err != nil {
 			return err
@@ -261,6 +267,12 @@ var updateCmd = &cobra.Command{
 			body.Tags = &v
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.UpdateMicroCopyManageMicroCopyMicroCopyIdPutWithResponse(cmdutil.Ctx(), args[0], &client.UpdateMicroCopyManageMicroCopyMicroCopyIdPutParams{}, body)
 		if err != nil {
 			return err
@@ -367,6 +379,12 @@ var createTranslationCmd = &cobra.Command{
 			Tags:     cmdutil.StringPtr(tags),
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateMicroCopyTranslationManageMicroCopySourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreateMicroCopyTranslationManageMicroCopySourceIdTranslationsPostParams{}, body)
 		if err != nil {
 			return err
@@ -423,4 +441,6 @@ func init() {
 	updateCmd.Flags().String("tags", "", "Tags")
 
 	getByKeyCmd.Flags().String("language", "", "Filter by language")
+
+	cmdutil.AddCustomFieldsFlag(createCmd, updateCmd, createTranslationCmd)
 }

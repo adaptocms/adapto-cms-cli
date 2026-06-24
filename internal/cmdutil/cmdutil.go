@@ -2,6 +2,7 @@ package cmdutil
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -74,6 +75,27 @@ func StringSlicePtr(s string) *[]string {
 		parts[i] = strings.TrimSpace(parts[i])
 	}
 	return &parts
+}
+
+func ParseCustomFields(cmd *cobra.Command) (*map[string]client.CustomFieldModel, error) {
+	v, _ := cmd.Flags().GetString("custom-fields-json")
+	if v == "" {
+		return nil, nil
+	}
+	var cf map[string]client.CustomFieldModel
+	dec := json.NewDecoder(strings.NewReader(v))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&cf); err != nil {
+		return nil, fmt.Errorf("invalid --custom-fields-json: %w", err)
+	}
+	return &cf, nil
+}
+
+// AddCustomFieldsFlag registers the standard --custom-fields-json flag.
+func AddCustomFieldsFlag(cmds ...*cobra.Command) {
+	for _, c := range cmds {
+		c.Flags().String("custom-fields-json", "", "Custom fields JSON object")
+	}
 }
 
 // AddListFlags adds common pagination/sorting flags to a command.

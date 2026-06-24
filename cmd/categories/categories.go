@@ -116,6 +116,12 @@ var createCmd = &cobra.Command{
 			ParentId:    cmdutil.StringPtr(parentID),
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateCategoryManageCategoriesPostWithResponse(cmdutil.Ctx(), &client.CreateCategoryManageCategoriesPostParams{}, body)
 		if err != nil {
 			return err
@@ -212,6 +218,12 @@ var updateCmd = &cobra.Command{
 		}
 		if v, _ := cmd.Flags().GetString("language"); v != "" {
 			body.Language = &v
+		}
+
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
 		}
 
 		resp, err := c.UpdateCategoryManageCategoriesCategoryIdPutWithResponse(cmdutil.Ctx(), args[0], &client.UpdateCategoryManageCategoriesCategoryIdPutParams{}, body)
@@ -434,6 +446,12 @@ var createTranslationCmd = &cobra.Command{
 			ParentId:    cmdutil.StringPtr(parentID),
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateTranslationManageCategoriesSourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreateTranslationManageCategoriesSourceIdTranslationsPostParams{}, body)
 		if err != nil {
 			return err
@@ -491,4 +509,5 @@ func init() {
 	updateCmd.Flags().String("parent-id", "", "Parent category ID")
 	updateCmd.Flags().String("language", "", "Language code")
 
+	cmdutil.AddCustomFieldsFlag(createCmd, updateCmd, createTranslationCmd)
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/adaptocms/adapto-cms-cli/cmd/articles"
@@ -9,7 +10,9 @@ import (
 	"github.com/adaptocms/adapto-cms-cli/cmd/collections"
 	"github.com/adaptocms/adapto-cms-cli/cmd/files"
 	"github.com/adaptocms/adapto-cms-cli/cmd/microcopy"
+	"github.com/adaptocms/adapto-cms-cli/cmd/pages"
 	"github.com/adaptocms/adapto-cms-cli/cmd/status"
+	"github.com/adaptocms/adapto-cms-cli/internal/httpclient"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -31,6 +34,7 @@ func init() {
 	rootCmd.AddCommand(collections.Cmd)
 	rootCmd.AddCommand(files.Cmd)
 	rootCmd.AddCommand(microcopy.Cmd)
+	rootCmd.AddCommand(pages.Cmd)
 	rootCmd.AddCommand(status.Cmd)
 
 	rootCmd.PersistentFlags().String("api-url", "", "Adapto API base URL (env: ADAPTO_API_URL)")
@@ -63,7 +67,11 @@ func initConfig() {
 // Execute runs the root command.
 func Execute() error {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(rootCmd.ErrOrStderr(), err)
+		if errors.Is(err, httpclient.ErrSessionExpired) {
+			fmt.Fprintln(rootCmd.ErrOrStderr(), httpclient.ErrSessionExpired)
+		} else {
+			fmt.Fprintln(rootCmd.ErrOrStderr(), err)
+		}
 		return err
 	}
 	return nil

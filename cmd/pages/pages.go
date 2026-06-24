@@ -126,6 +126,12 @@ var createCmd = &cobra.Command{
 			body.MediaObjectsPlacements = &placements
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreatePageManagePagesPostWithResponse(cmdutil.Ctx(), &client.CreatePageManagePagesPostParams{}, body)
 		if err != nil {
 			return err
@@ -239,6 +245,12 @@ var updateCmd = &cobra.Command{
 				return fmt.Errorf("invalid --media-json: %w", err)
 			}
 			body.MediaObjectsPlacements = &placements
+		}
+
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
 		}
 
 		resp, err := c.UpdatePageManagePagesPageIdPutWithResponse(cmdutil.Ctx(), args[0], &client.UpdatePageManagePagesPageIdPutParams{}, body)
@@ -409,6 +421,12 @@ var createTranslationCmd = &cobra.Command{
 			body.MediaObjectsPlacements = &placements
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreatePageTranslationManagePagesSourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreatePageTranslationManagePagesSourceIdTranslationsPostParams{}, body)
 		if err != nil {
 			return err
@@ -475,4 +493,6 @@ func init() {
 	updateCmd.Flags().String("status", "", "Status")
 	updateCmd.Flags().String("tags", "", "Comma-separated tags")
 	updateCmd.Flags().String("media-json", "", "Media objects placements JSON array")
+
+	cmdutil.AddCustomFieldsFlag(createCmd, updateCmd, createTranslationCmd)
 }

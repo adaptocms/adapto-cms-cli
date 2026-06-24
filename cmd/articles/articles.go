@@ -142,6 +142,12 @@ var createCmd = &cobra.Command{
 			body.MediaObjectsPlacements = &placements
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateArticleManageArticlesPostWithResponse(cmdutil.Ctx(), &client.CreateArticleManageArticlesPostParams{}, body)
 		if err != nil {
 			return err
@@ -262,6 +268,12 @@ var updateCmd = &cobra.Command{
 				return fmt.Errorf("invalid --media-json: %w", err)
 			}
 			body.MediaObjectsPlacements = &placements
+		}
+
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
 		}
 
 		resp, err := c.UpdateArticleManageArticlesArticleIdPutWithResponse(cmdutil.Ctx(), args[0], &client.UpdateArticleManageArticlesArticleIdPutParams{}, body)
@@ -445,6 +457,12 @@ var createTranslationCmd = &cobra.Command{
 			body.MediaObjectsPlacements = &placements
 		}
 
+		if cf, err := cmdutil.ParseCustomFields(cmd); err != nil {
+			return err
+		} else if cf != nil {
+			body.CustomFields = cf
+		}
+
 		resp, err := c.CreateTranslationManageArticlesSourceIdTranslationsPostWithResponse(cmdutil.Ctx(), args[0], &client.CreateTranslationManageArticlesSourceIdTranslationsPostParams{}, body)
 		if err != nil {
 			return err
@@ -547,4 +565,6 @@ func init() {
 	updateCmd.Flags().String("tags", "", "Comma-separated tags")
 	updateCmd.Flags().String("source", "", "Source JSON")
 	updateCmd.Flags().String("media-json", "", "Media objects placements JSON array")
+
+	cmdutil.AddCustomFieldsFlag(createCmd, updateCmd, createTranslationCmd)
 }
