@@ -28,23 +28,37 @@ func main() {
 	if !ok {
 		fatal(fmt.Errorf("README.md: %q marker not found", beginMarker))
 	}
-	_, after, ok := strings.Cut(rest, endMarker)
+	inner, after, ok := strings.Cut(rest, endMarker)
 	if !ok {
 		fatal(fmt.Errorf("README.md: %q marker not found", endMarker))
 	}
 
-	out := before + beginMarker + "\n```\n" + renderTree(cmd.Root()) + "```\n" + endMarker + after
+	tree := renderTree(cmd.Root())
 	if *check {
-		if out != string(data) {
+		if fenceContent(inner) != strings.TrimSpace(tree) {
 			fatal(fmt.Errorf("README.md command tree is stale: run make docs"))
 		}
 		fmt.Println("README.md command tree is current")
 		return
 	}
+	out := before + beginMarker + "\n\n```\n" + tree + "```\n\n" + endMarker + after
 	if err := os.WriteFile("README.md", []byte(out), 0644); err != nil {
 		fatal(err)
 	}
 	fmt.Println("README.md command tree regenerated")
+}
+
+func fenceContent(block string) string {
+	start := strings.Index(block, "```")
+	end := strings.LastIndex(block, "```")
+	if start == -1 || end <= start {
+		return ""
+	}
+	content := block[start+3 : end]
+	if i := strings.Index(content, "\n"); i >= 0 {
+		content = content[i+1:]
+	}
+	return strings.TrimSpace(content)
 }
 
 func renderTree(root *cobra.Command) string {

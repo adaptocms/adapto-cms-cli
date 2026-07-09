@@ -11,6 +11,7 @@ adapto articles update ARTICLE_ID --custom-fields-json '{
 ```
 
 Each field definition has:
+
 - `type` (string, required) — one of: `text`, `textarea`, `number`, `date`, `date_range`, `boolean`, `reference`, `image`, `file`, `url`, `email`, `color`, `rich_text`
 - `value` — the field value; its JSON type should match `type` (string, number, boolean, or an array when `multiple` is true)
 - `multiple` (bool, optional, default false) — whether `value` is a list
@@ -18,6 +19,7 @@ Each field definition has:
 - `media_objects_placements` (array, optional) — media placements for `rich_text` fields (same shape as `--media-json`)
 
 Notes:
+
 - On `update` the supplied object **replaces the entire custom-fields map** — include every field you want to keep.
 - Unknown keys inside a field definition are rejected so the payload matches the API contract exactly.
 - For `file`/`image` fields, set `value` to a file ID; responses include a `file_urls` map resolving those IDs to URLs.
@@ -141,6 +143,7 @@ adapto articles create \
 ```
 
 Each placement object has:
+
 - `placement_key` (string) — where the media goes (e.g. "hero_image", "body_image_1")
 - `media_object` (object) — id, file_id, url, type (image/video/audio/document/other/youtube/vimeo/tiktok/instagram_reel/instagram_post), title, description
 - `caption` (string|null), `alt_text` (string|null), `meta_data` (string|null)
