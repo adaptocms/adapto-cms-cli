@@ -15,6 +15,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "pages",
 	Short: "Manage pages",
+	Long:  "Manage pages. All subcommands require authentication.",
 }
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List pages",
+	Long:  "List pages with pagination and filters.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -53,7 +55,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -136,7 +138,7 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -163,7 +165,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -190,7 +192,7 @@ var getBySlugCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -206,6 +208,7 @@ var getBySlugCmd = &cobra.Command{
 var updateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a page",
+	Long:  "Update a page. Only provided flags are changed.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -257,7 +260,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -284,7 +287,7 @@ var deleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -307,7 +310,7 @@ var publishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -330,7 +333,7 @@ var archiveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -353,7 +356,7 @@ var translationsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -431,7 +434,7 @@ var createTranslationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -473,12 +476,12 @@ func init() {
 	cmdutil.AddListFlags(listCmd)
 
 	for _, c := range []*cobra.Command{createCmd, createTranslationCmd} {
-		c.Flags().String("title", "", "Page title")
-		c.Flags().String("content", "", "Page content")
-		c.Flags().String("slug", "", "URL-friendly identifier")
+		c.Flags().String("title", "", "Page title (required)")
+		c.Flags().String("content", "", "Page content (required)")
+		c.Flags().String("slug", "", "URL-friendly identifier (required)")
 		c.Flags().String("menu-label", "", "Menu label")
 		c.Flags().String("parent-id", "", "Parent page ID")
-		c.Flags().String("language", "", "Language code")
+		c.Flags().String("language", "", "Language code (required)")
 		c.Flags().String("status", "", "Status")
 		c.Flags().String("tags", "", "Comma-separated tags")
 		c.Flags().String("media-json", "", "Media objects placements JSON array")

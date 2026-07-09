@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/charmbracelet/huh"
 	"github.com/adaptocms/adapto-cms-cli/internal/client"
 	"github.com/adaptocms/adapto-cms-cli/internal/cmdutil"
 	"github.com/adaptocms/adapto-cms-cli/internal/config"
@@ -12,6 +11,7 @@ import (
 	"github.com/adaptocms/adapto-cms-cli/internal/httpclient"
 	"github.com/adaptocms/adapto-cms-cli/internal/output"
 	"github.com/adaptocms/adapto-cms-cli/internal/prompt"
+	"github.com/charmbracelet/huh"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/spf13/cobra"
 )
@@ -41,8 +41,10 @@ func init() {
 }
 
 var loginCmd = &cobra.Command{
-	Use:   "login",
-	Short: "Login with email and password",
+	Use:     "login",
+	Short:   "Login with email and password",
+	Long:    "Login with email and password. Saves tokens to credentials file and prompts for tenant selection.",
+	Example: "adapto auth login --email user@example.com --password secret",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
 		password, _ := cmd.Flags().GetString("password")
@@ -67,7 +69,7 @@ var loginCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -91,7 +93,7 @@ var loginCmd = &cobra.Command{
 		}
 
 		result := map[string]interface{}{
-			"message": "Logged in successfully",
+			"message":          "Logged in successfully",
 			"credentials_path": credentials.Path(),
 		}
 		if tenantID != "" {
@@ -144,7 +146,7 @@ var registerCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -160,6 +162,7 @@ var registerCmd = &cobra.Command{
 var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "Logout (revoke refresh token)",
+	Long:  "Logout and revoke refresh token. Clears stored credentials.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		refreshToken, _ := cmd.Flags().GetString("refresh-token")
 
@@ -184,7 +187,7 @@ var logoutCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -200,6 +203,7 @@ var logoutCmd = &cobra.Command{
 var refreshCmd = &cobra.Command{
 	Use:   "refresh",
 	Short: "Refresh access token",
+	Long:  "Refresh the access token. Updates stored credentials.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		refreshToken, _ := cmd.Flags().GetString("refresh-token")
 
@@ -224,7 +228,7 @@ var refreshCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -254,6 +258,7 @@ var refreshCmd = &cobra.Command{
 var meCmd = &cobra.Command{
 	Use:   "me",
 	Short: "Get current user info",
+	Long:  "Get current user info (ID, email, status, name).",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -264,7 +269,7 @@ var meCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -317,7 +322,7 @@ var changePasswordCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -347,7 +352,7 @@ var requestPasswordResetCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -359,6 +364,7 @@ var requestPasswordResetCmd = &cobra.Command{
 var resetPasswordCmd = &cobra.Command{
 	Use:   "reset-password",
 	Short: "Reset password with token",
+	Long:  "Reset password with a token received via email.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, _ := cmd.Flags().GetString("token")
 		newPassword, _ := cmd.Flags().GetString("new-password")
@@ -383,7 +389,7 @@ var resetPasswordCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -395,6 +401,7 @@ var resetPasswordCmd = &cobra.Command{
 var activateCmd = &cobra.Command{
 	Use:   "activate",
 	Short: "Activate account with token",
+	Long:  "Activate account with a token received via email.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, _ := cmd.Flags().GetString("token")
 		var err error
@@ -413,7 +420,7 @@ var activateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -443,7 +450,7 @@ var resendActivationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -455,6 +462,7 @@ var resendActivationCmd = &cobra.Command{
 var loginGithubCmd = &cobra.Command{
 	Use:   "login-github",
 	Short: "Login via GitHub OAuth",
+	Long:  "Login via GitHub OAuth. Returns the OAuth URL to visit.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		redirectURI, _ := cmd.Flags().GetString("redirect-uri")
 
@@ -469,7 +477,7 @@ var loginGithubCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -506,7 +514,7 @@ var callbackGithubCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -540,7 +548,7 @@ var loginGoogleCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -554,33 +562,33 @@ var loginGoogleCmd = &cobra.Command{
 }
 
 func init() {
-	loginCmd.Flags().String("email", "", "Email address")
-	loginCmd.Flags().String("password", "", "Password")
+	loginCmd.Flags().String("email", "", "Email address (required)")
+	loginCmd.Flags().String("password", "", "Password (required)")
 
-	registerCmd.Flags().String("email", "", "Email address")
-	registerCmd.Flags().String("password", "", "Password")
+	registerCmd.Flags().String("email", "", "Email address (required)")
+	registerCmd.Flags().String("password", "", "Password (required)")
 	registerCmd.Flags().String("first-name", "", "First name")
 	registerCmd.Flags().String("last-name", "", "Last name")
 
 	logoutCmd.Flags().String("refresh-token", "", "Refresh token to revoke")
 	refreshCmd.Flags().String("refresh-token", "", "Refresh token")
 
-	changePasswordCmd.Flags().String("current-password", "", "Current password")
-	changePasswordCmd.Flags().String("new-password", "", "New password")
+	changePasswordCmd.Flags().String("current-password", "", "Current password (required)")
+	changePasswordCmd.Flags().String("new-password", "", "New password (required)")
 
-	requestPasswordResetCmd.Flags().String("email", "", "Email address")
+	requestPasswordResetCmd.Flags().String("email", "", "Email address (required)")
 
-	resetPasswordCmd.Flags().String("token", "", "Password reset token")
-	resetPasswordCmd.Flags().String("new-password", "", "New password")
+	resetPasswordCmd.Flags().String("token", "", "Password reset token (required)")
+	resetPasswordCmd.Flags().String("new-password", "", "New password (required)")
 
-	activateCmd.Flags().String("token", "", "Activation token")
-	resendActivationCmd.Flags().String("email", "", "Email address")
+	activateCmd.Flags().String("token", "", "Activation token (required)")
+	resendActivationCmd.Flags().String("email", "", "Email address (required)")
 
 	loginGithubCmd.Flags().String("redirect-uri", "", "OAuth redirect URI")
-	callbackGithubCmd.Flags().String("code", "", "OAuth authorization code")
+	callbackGithubCmd.Flags().String("code", "", "OAuth authorization code (required)")
 	callbackGithubCmd.Flags().String("redirect-uri", "", "OAuth redirect URI")
 
-	loginGoogleCmd.Flags().String("credential", "", "Google ID token")
+	loginGoogleCmd.Flags().String("credential", "", "Google ID token (required)")
 
 	switchTenantCmd.Flags().String("tenant-id", "", "Tenant/organization ID to switch to")
 }
@@ -621,6 +629,7 @@ var switchTenantCmd = &cobra.Command{
 var orgsCmd = &cobra.Command{
 	Use:   "orgs",
 	Short: "List your organizations and their tenants",
+	Long:  "List your organizations and their tenants, showing which tenant is active.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -631,7 +640,7 @@ var orgsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 		if resp.JSON200 == nil {

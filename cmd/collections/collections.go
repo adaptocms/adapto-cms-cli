@@ -14,6 +14,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "collections",
 	Short: "Manage custom collections",
+	Long:  "Manage custom collections. All subcommands require authentication.",
 }
 
 var itemsCmd = &cobra.Command{
@@ -31,6 +32,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List collections",
+	Long:  "List collections with pagination and filters.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -55,7 +57,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -132,7 +134,7 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -159,7 +161,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -186,7 +188,7 @@ var getBySlugCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -202,6 +204,7 @@ var getBySlugCmd = &cobra.Command{
 var updateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a collection",
+	Long:  "Update a collection. Only provided flags are changed.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -238,7 +241,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -265,7 +268,7 @@ var deleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -306,7 +309,7 @@ var itemsListCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -334,9 +337,10 @@ var itemsListCmd = &cobra.Command{
 }
 
 var itemsCreateCmd = &cobra.Command{
-	Use:   "create <collection_id>",
-	Short: "Create a collection item",
-	Args:  cobra.ExactArgs(1),
+	Use:     "create <collection_id>",
+	Short:   "Create a collection item",
+	Example: `adapto collections items create abc123 --title "My Item" --slug my-item --language en-US --data-json '{"field1":"value1"}'`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		slug, _ := cmd.Flags().GetString("slug")
@@ -387,7 +391,7 @@ var itemsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -403,6 +407,7 @@ var itemsCreateCmd = &cobra.Command{
 var itemsCreateBatchCmd = &cobra.Command{
 	Use:   "create-batch <collection_id>",
 	Short: "Create multiple items in batch",
+	Long:  "Create multiple items in one atomic request: either every item is created or none is (any validation or database failure rolls back the whole batch).",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		itemsJSON, _ := cmd.Flags().GetString("items-json")
@@ -425,7 +430,7 @@ var itemsCreateBatchCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -448,7 +453,7 @@ var itemsGetCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -475,7 +480,7 @@ var itemsGetBySlugCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -491,6 +496,7 @@ var itemsGetBySlugCmd = &cobra.Command{
 var itemsUpdateCmd = &cobra.Command{
 	Use:   "update <collection_id> <item_id>",
 	Short: "Update a collection item",
+	Long:  "Update a collection item. Only provided flags are changed.",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -531,7 +537,7 @@ var itemsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -558,7 +564,7 @@ var itemsDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -581,7 +587,7 @@ var itemsPublishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -604,7 +610,7 @@ var itemsArchiveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -627,7 +633,7 @@ var itemsTranslationsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -700,7 +706,7 @@ var itemsCreateTranslationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -749,10 +755,10 @@ func printItem(item *client.CustomCollectionItemResponseModel) {
 func init() {
 	cmdutil.AddListFlags(listCmd)
 
-	createCmd.Flags().String("name", "", "Collection name")
-	createCmd.Flags().String("slug", "", "URL-friendly identifier")
-	createCmd.Flags().String("description", "", "Collection description")
-	createCmd.Flags().String("language", "", "Language code")
+	createCmd.Flags().String("name", "", "Collection name (required)")
+	createCmd.Flags().String("slug", "", "URL-friendly identifier (required)")
+	createCmd.Flags().String("description", "", "Collection description (required)")
+	createCmd.Flags().String("language", "", "Language code (required)")
 	createCmd.Flags().String("fields-json", "", "Field definitions JSON")
 	createCmd.Flags().String("status", "", "Status")
 
@@ -769,10 +775,10 @@ func init() {
 
 	// Items create/create-translation flags
 	for _, c := range []*cobra.Command{itemsCreateCmd, itemsCreateTranslationCmd} {
-		c.Flags().String("title", "", "Item title")
-		c.Flags().String("slug", "", "URL-friendly identifier")
-		c.Flags().String("data-json", "", "Item data JSON")
-		c.Flags().String("language", "", "Language code")
+		c.Flags().String("title", "", "Item title (required)")
+		c.Flags().String("slug", "", "URL-friendly identifier (required)")
+		c.Flags().String("data-json", "", "Item data JSON (required)")
+		c.Flags().String("language", "", "Language code (required)")
 		c.Flags().String("status", "", "Status")
 		c.Flags().String("media-json", "", "Media objects placements JSON array")
 	}
@@ -786,5 +792,5 @@ func init() {
 	itemsUpdateCmd.Flags().String("media-json", "", "Media objects placements JSON array")
 
 	// Items batch create
-	itemsCreateBatchCmd.Flags().String("items-json", "", "Batch items JSON")
+	itemsCreateBatchCmd.Flags().String("items-json", "", "Batch items JSON (required)")
 }

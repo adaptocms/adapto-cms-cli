@@ -16,6 +16,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "articles",
 	Short: "Manage articles",
+	Long:  "Manage articles. All subcommands require authentication.",
 }
 
 func init() {
@@ -24,8 +25,10 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List articles",
+	Use:     "list",
+	Short:   "List articles",
+	Long:    "List articles with pagination and filters.",
+	Example: "adapto articles list --status published --language en-US --limit 10",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -56,7 +59,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -77,8 +80,9 @@ var listCmd = &cobra.Command{
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create an article",
+	Use:     "create",
+	Short:   "Create an article",
+	Example: `adapto articles create --title "Hello World" --content "<p>Body</p>" --slug hello-world --author "Jane" --language en-US`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		content, _ := cmd.Flags().GetString("content")
@@ -152,7 +156,7 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -179,7 +183,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -206,7 +210,7 @@ var getBySlugCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -222,6 +226,7 @@ var getBySlugCmd = &cobra.Command{
 var updateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update an article",
+	Long:  "Update an article. Only provided flags are changed.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -280,7 +285,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -307,7 +312,7 @@ var deleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -319,6 +324,7 @@ var deleteCmd = &cobra.Command{
 var publishCmd = &cobra.Command{
 	Use:   "publish <id>",
 	Short: "Publish an article",
+	Long:  "Publish an article (set status to published).",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -330,7 +336,7 @@ var publishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -353,7 +359,7 @@ var archiveCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -376,7 +382,7 @@ var translationsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -467,7 +473,7 @@ var createTranslationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -483,6 +489,7 @@ var createTranslationCmd = &cobra.Command{
 var categoriesCmd = &cobra.Command{
 	Use:   "categories <id>",
 	Short: "List categories of an article",
+	Long:  "List category IDs associated with an article.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -494,7 +501,7 @@ var categoriesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -543,12 +550,12 @@ func init() {
 	cmdutil.AddListFlags(listCmd)
 
 	for _, c := range []*cobra.Command{createCmd, createTranslationCmd} {
-		c.Flags().String("title", "", "Article title")
-		c.Flags().String("content", "", "Article content")
-		c.Flags().String("slug", "", "URL-friendly identifier")
-		c.Flags().String("author", "", "Author name")
+		c.Flags().String("title", "", "Article title (required)")
+		c.Flags().String("content", "", "Article content (required)")
+		c.Flags().String("slug", "", "URL-friendly identifier (required)")
+		c.Flags().String("author", "", "Author name (required)")
 		c.Flags().String("summary", "", "Article summary")
-		c.Flags().String("language", "", "Language code")
+		c.Flags().String("language", "", "Language code (required)")
 		c.Flags().String("status", "", "Status (draft/published)")
 		c.Flags().String("tags", "", "Comma-separated tags")
 		c.Flags().String("source", "", "Source JSON")

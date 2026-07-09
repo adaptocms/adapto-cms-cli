@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/adaptocms/adapto-cms-cli/internal/client"
@@ -30,7 +31,7 @@ func NewClientWithAuth() (*client.ClientWithResponses, config.Config, error) {
 		return nil, cfg, err
 	}
 	if cfg.Token == "" {
-		return nil, cfg, fmt.Errorf("authentication required: set ADAPTO_TOKEN or --token")
+		return nil, cfg, fmt.Errorf("authentication required: run 'adapto auth login' (or set ADAPTO_CLI_TOKEN / --token)")
 	}
 	return c, cfg, nil
 }
@@ -41,12 +42,8 @@ func Ctx() context.Context {
 }
 
 // CheckErr checks an HTTP response for errors using the body bytes.
-func CheckErr(statusCode int, body []byte) error {
-	if statusCode >= 200 && statusCode < 300 {
-		return nil
-	}
-	// Create a minimal http.Response for the error checker
-	return apierrors.CheckHTTP(statusCode, body)
+func CheckErr(httpResp *http.Response, body []byte) error {
+	return apierrors.CheckResponse(httpResp, body)
 }
 
 // StringPtr returns a pointer to a string, or nil if empty.

@@ -12,6 +12,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "status",
 	Short: "API status commands",
+	Long:  "Check API status. Running 'adapto status' directly returns the API health status.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -22,7 +23,7 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -55,7 +56,7 @@ var versionCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 

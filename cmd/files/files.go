@@ -21,6 +21,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "files",
 	Short: "Manage files",
+	Long:  "Manage files. All subcommands require authentication.",
 }
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List files",
+	Long:  "List files with pagination and filters.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -60,7 +62,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -122,7 +124,7 @@ var createMetadataCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -136,10 +138,11 @@ var createMetadataCmd = &cobra.Command{
 }
 
 var uploadCmd = &cobra.Command{
-	Use:   "upload <filepath>",
-	Short: "Upload a file",
-	Long:  "Upload a file directly. Creates metadata and uploads in one step.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "upload <filepath>",
+	Short:   "Upload a file",
+	Long:    "Upload a file directly. Creates metadata and uploads in one step via multipart/form-data. Returns the full file record including URL.",
+	Example: "adapto files upload ./photo.jpg",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -155,7 +158,7 @@ var uploadCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -169,9 +172,11 @@ var uploadCmd = &cobra.Command{
 }
 
 var uploadByIDCmd = &cobra.Command{
-	Use:   "upload-by-id <file_id> <filepath>",
-	Short: "Upload file content for an existing file record",
-	Args:  cobra.ExactArgs(2),
+	Use:     "upload-by-id <file_id> <filepath>",
+	Short:   "Upload file content for an existing file record",
+	Long:    "Upload file content for an existing file record via multipart/form-data.",
+	Example: "adapto files upload-by-id FILE_ID ./photo.jpg",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -187,7 +192,7 @@ var uploadByIDCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -214,7 +219,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -249,7 +254,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -276,7 +281,7 @@ var deleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -288,6 +293,7 @@ var deleteCmd = &cobra.Command{
 var multipartInitCmd = &cobra.Command{
 	Use:   "multipart-init <file_id>",
 	Short: "Initialize a multipart upload",
+	Long:  "Initialize a multipart upload. Returns a file ID and upload ID.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -299,7 +305,7 @@ var multipartInitCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -316,6 +322,7 @@ var multipartInitCmd = &cobra.Command{
 var multipartUploadCmd = &cobra.Command{
 	Use:   "multipart-upload <file_id> <upload_id> <part_number> <filepath>",
 	Short: "Upload a part of a multipart upload",
+	Long:  "Upload a part. Outputs a curl command for the actual upload.",
 	Args:  cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("multipart part upload uses multipart HTTP - use curl:\n  curl -X POST %s/manage/files/%s/multipart/%s/parts/%s -H 'Authorization: Bearer $ADAPTO_TOKEN' -F 'file=@%s'",
@@ -348,7 +355,7 @@ var multipartCompleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -371,7 +378,7 @@ var multipartAbortCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -444,8 +451,8 @@ func init() {
 	listCmd.Flags().Int("page", 0, "Page number")
 	listCmd.Flags().Int("limit", 0, "Items per page")
 
-	createMetadataCmd.Flags().String("filename", "", "Original filename")
-	createMetadataCmd.Flags().String("content-type", "", "MIME type")
+	createMetadataCmd.Flags().String("filename", "", "Original filename (required)")
+	createMetadataCmd.Flags().String("content-type", "", "MIME type (required)")
 	createMetadataCmd.Flags().String("tags", "", "Comma-separated tags")
 
 	uploadCmd.Flags().String("tags", "", "Comma-separated tags")
@@ -453,5 +460,5 @@ func init() {
 	updateCmd.Flags().String("filename", "", "New filename")
 	updateCmd.Flags().String("tags", "", "Comma-separated tags")
 
-	multipartCompleteCmd.Flags().String("parts", "", "Parts JSON array")
+	multipartCompleteCmd.Flags().String("parts", "", "Parts JSON array (required)")
 }
