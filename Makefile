@@ -1,8 +1,8 @@
 APP_NAME := adapto
-VERSION ?= dev
+VERSION ?= dev-$(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 
-.PHONY: build test lint generate clean install release
+.PHONY: build test check-docs lint generate docs clean install release
 
 build:
 	go build $(LDFLAGS) -o $(APP_NAME) .
@@ -11,13 +11,21 @@ install:
 	go install $(LDFLAGS) .
 
 test:
-	go test ./...
+	go build ./...
+	go vet ./...
+	go test -race ./...
+
+check-docs:
+	go run ./tools/gendocs -check
 
 lint:
 	golangci-lint run ./...
 
 generate:
 	./scripts/generate.sh
+
+docs:
+	go run ./tools/gendocs
 
 clean:
 	rm -f $(APP_NAME)
