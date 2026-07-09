@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   test:
+    # Pushes to main/develop already run CI; skip the duplicate pull_request run.
+    if: github.event_name != 'pull_request' || (github.head_ref != 'main' && github.head_ref != 'develop')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
