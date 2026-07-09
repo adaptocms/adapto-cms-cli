@@ -47,7 +47,7 @@ func friendlyMessage(code int) string {
 	case 403:
 		return "Forbidden - insufficient permissions"
 	case 404:
-		return "Missing"
+		return "Not found"
 	case 409:
 		return "Conflict - resource already exists"
 	case 422:
