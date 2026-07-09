@@ -14,6 +14,7 @@ import (
 var Cmd = &cobra.Command{
 	Use:   "categories",
 	Short: "Manage categories",
+	Long:  "Manage categories. All subcommands require authentication.",
 }
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List categories",
+	Long:  "List categories with pagination and filters.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -51,7 +53,7 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -126,7 +128,7 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -153,7 +155,7 @@ var getCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -180,7 +182,7 @@ var getBySlugCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -196,6 +198,7 @@ var getBySlugCmd = &cobra.Command{
 var updateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a category",
+	Long:  "Update a category. Only provided flags are changed.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -230,7 +233,7 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -257,7 +260,7 @@ var deleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -280,7 +283,7 @@ var subcategoriesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -302,6 +305,7 @@ var subcategoriesCmd = &cobra.Command{
 var articlesCmd = &cobra.Command{
 	Use:   "articles <category_id>",
 	Short: "List articles in a category",
+	Long:  "List article IDs in a category.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
@@ -313,7 +317,7 @@ var articlesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -346,7 +350,7 @@ var addArticleCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -369,7 +373,7 @@ var removeArticleCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -392,7 +396,7 @@ var translationsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -456,7 +460,7 @@ var createTranslationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := cmdutil.CheckErr(resp.StatusCode(), resp.Body); err != nil {
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
 			return err
 		}
 
@@ -496,11 +500,11 @@ func init() {
 	cmdutil.AddListFlags(listCmd)
 
 	for _, c := range []*cobra.Command{createCmd, createTranslationCmd} {
-		c.Flags().String("name", "", "Category name")
-		c.Flags().String("slug", "", "URL-friendly identifier")
+		c.Flags().String("name", "", "Category name (required)")
+		c.Flags().String("slug", "", "URL-friendly identifier (required)")
 		c.Flags().String("description", "", "Category description")
 		c.Flags().String("parent-id", "", "Parent category ID")
-		c.Flags().String("language", "", "Language code")
+		c.Flags().String("language", "", "Language code (required)")
 	}
 
 	updateCmd.Flags().String("name", "", "Category name")

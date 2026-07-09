@@ -3,17 +3,20 @@ package errors
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
-// CheckHTTP returns a user-friendly error for non-2xx status codes, or nil.
-func CheckHTTP(statusCode int, body []byte) error {
-	if statusCode >= 200 && statusCode < 300 {
+// CheckResponse returns a user-friendly error for non-2xx responses, or nil.
+func CheckResponse(resp *http.Response, body []byte) error {
+	if resp == nil || (resp.StatusCode >= 200 && resp.StatusCode < 300) {
 		return nil
 	}
 
-	msg := friendlyMessage(statusCode)
+	msg := friendlyMessage(resp.StatusCode)
+	if resp.Request != nil && resp.Request.URL != nil {
+		msg += fmt.Sprintf(" (%s %s)", resp.Request.Method, resp.Request.URL)
+	}
 
-	// Try to extract detail from JSON body
 	var detail struct {
 		Detail interface{} `json:"detail"`
 	}
@@ -40,7 +43,7 @@ func friendlyMessage(code int) string {
 	case 400:
 		return "Bad request"
 	case 401:
-		return "Unauthorized - check your token (ADAPTO_TOKEN or --token)"
+		return "Unauthorized - check your token (ADAPTO_CLI_TOKEN or --token)"
 	case 403:
 		return "Forbidden - insufficient permissions"
 	case 404:
