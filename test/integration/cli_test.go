@@ -14,6 +14,9 @@ import (
 
 	"github.com/adaptocms/adapto-cms-cli/internal/client"
 	"github.com/adaptocms/adapto-cms-cli/test/mockapi"
+
+	// Invalidates the cached test result when any CLI code changes.
+	_ "github.com/adaptocms/adapto-cms-cli/cmd"
 )
 
 var binPath string
