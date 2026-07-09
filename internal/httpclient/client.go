@@ -20,7 +20,7 @@ var ErrSessionExpired = errors.New("session expired — run 'adapto auth login' 
 // New creates a ClientWithResponses that injects Bearer token and X-Tenant-ID headers.
 func New(cfg config.Config) (*client.ClientWithResponses, error) {
 	if cfg.APIURL == "" {
-		return nil, fmt.Errorf("API URL is required (set ADAPTO_API_URL or --api-url)")
+		return nil, fmt.Errorf("API URL is required (set ADAPTO_CLI_API_URL or --api-url)")
 	}
 
 	var base http.RoundTripper = http.DefaultTransport
