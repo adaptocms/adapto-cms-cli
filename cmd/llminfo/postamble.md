@@ -165,5 +165,5 @@ adapto articles list --json --limit 100
 - Pagination: use `--page` and `--limit` flags. Responses include total, page, and pages fields.
 - Flags marked "(required)" will be prompted interactively if omitted in a TTY. In non-interactive mode, they must be provided.
 - Use `--json` on any command to get machine-readable JSON output.
-- `adapto collections items create-batch` is atomic: either every item in the batch is created or none is.
+- `adapto collections items create-batch` is atomic: either every item in the batch is created or none is. It accepts at most 100 items per request and prints the created items with their ids. A conflict error (409) means the items' slug + language combinations already exist in the collection — a previous attempt may have succeeded, so verify with `items list` instead of retrying; a validation error (400/422) means nothing was persisted.
 - HTTP errors include the request method and resolved URL — if the URL is not `https://api.adaptocms.com/...`, the CLI is misconfigured (see "Two APIs" above).

@@ -407,7 +407,9 @@ var itemsCreateCmd = &cobra.Command{
 var itemsCreateBatchCmd = &cobra.Command{
 	Use:   "create-batch <collection_id>",
 	Short: "Create multiple items in batch",
-	Long:  "Create multiple items in one atomic request: either every item is created or none is (any validation or database failure rolls back the whole batch).",
+	Long: "Create multiple items in one atomic request: either every item is created or none is (any validation or database failure rolls back the whole batch). " +
+		"Accepts at most 100 items per request and returns the created items with their ids. " +
+		"A slug + language combination that already exists in the collection fails the whole batch with a conflict error.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		itemsJSON, _ := cmd.Flags().GetString("items-json")
@@ -434,7 +436,18 @@ var itemsCreateBatchCmd = &cobra.Command{
 			return err
 		}
 
-		output.Successf("Batch created successfully.")
+		if resp.JSON201 != nil {
+			items := *resp.JSON201
+			output.Print(items, func(d interface{}) {
+				output.Successf("Batch created %d items.", len(items))
+				headers := []string{"ID", "Title", "Status", "Language", "Slug"}
+				rows := make([][]string, len(items))
+				for i, item := range items {
+					rows[i] = []string{item.Id, output.Truncate(item.Title, 40), string(item.Status), item.Language, output.Truncate(item.Slug, 30)}
+				}
+				output.Table(headers, rows)
+			})
+		}
 		return nil
 	},
 }
