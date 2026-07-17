@@ -22,26 +22,28 @@ Download the binary for your platform from [GitHub Releases](https://github.com/
 
 ## Quick Start
 
+**Existing account:**
+
 ```bash
-# Login (credentials are saved automatically)
 adapto auth login --email you@example.com --password yourpassword
+```
 
-# List articles
-adapto articles list
+**New account:**
 
-# Get JSON output
+```bash
+adapto auth register --email you@example.com --password yourpassword
+# the activation email contains a ready-to-run command:
+adapto auth activate --token <token-from-email>
+adapto onboard   # creates your first project + API key
+```
+
+Credentials are saved to `~/.config/adapto/credentials.json` and read automatically. The flow is flag-driven so an agent can run it end to end; the only manual step is pasting the activation token from the email.
+
+**Manage content:**
+
+```bash
 adapto articles list --json
-
-# Create an article (interactive prompts for missing fields)
-adapto articles create
-
-# Create with flags
-adapto articles create \
-  --title "My Article" \
-  --content "Hello world" \
-  --slug "my-article" \
-  --author "Jane" \
-  --language "en-US"
+adapto articles create --title "My Article" --content "Hello world" --slug my-article --author Jane --language en-US
 ```
 
 ## LLM Integration

@@ -28,13 +28,22 @@ Notes:
 
 ## Common Workflows
 
-### 1. Login and select a tenant
+### 1. Get set up
+
+Existing account:
 
 ```bash
 adapto auth login --email user@example.com --password secret
-# Interactive tenant picker appears if you have multiple tenants
-# Or specify directly:
+# multiple tenants? select one:
 adapto auth switch-tenant --tenant-id TENANT_ID
+```
+
+New account (the only manual step is pasting the activation token from the email):
+
+```bash
+adapto auth register --email user@example.com --password secret
+adapto auth activate --token <token-from-email>                      # activates and logs in
+adapto onboard --project-name "My Project" --default-language en-US  # creates project + API key, sets it active
 ```
 
 ### 2. List and create articles
