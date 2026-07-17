@@ -162,6 +162,24 @@ func (e CustomFieldType) Valid() bool {
 	}
 }
 
+// Defines values for ExportTrigger.
+const (
+	Bulk  ExportTrigger = "bulk"
+	Event ExportTrigger = "event"
+)
+
+// Valid indicates whether the value is a known member of the ExportTrigger enum.
+func (e ExportTrigger) Valid() bool {
+	switch e {
+	case Bulk:
+		return true
+	case Event:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ExternalUserRoleKey.
 const (
 	ContentManager ExternalUserRoleKey = "content_manager"
@@ -375,6 +393,57 @@ func (e GripEntityType) Valid() bool {
 	}
 }
 
+// Defines values for JobStatus.
+const (
+	JobStatusCancelled       JobStatus = "cancelled"
+	JobStatusCompleted       JobStatus = "completed"
+	JobStatusFailed          JobStatus = "failed"
+	JobStatusPartiallyFailed JobStatus = "partially_failed"
+	JobStatusPending         JobStatus = "pending"
+	JobStatusRunning         JobStatus = "running"
+)
+
+// Valid indicates whether the value is a known member of the JobStatus enum.
+func (e JobStatus) Valid() bool {
+	switch e {
+	case JobStatusCancelled:
+		return true
+	case JobStatusCompleted:
+		return true
+	case JobStatusFailed:
+		return true
+	case JobStatusPartiallyFailed:
+		return true
+	case JobStatusPending:
+		return true
+	case JobStatusRunning:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OnboardingStatus.
+const (
+	OnboardingStatusCompleted OnboardingStatus = "completed"
+	OnboardingStatusInvited   OnboardingStatus = "invited"
+	OnboardingStatusSkipped   OnboardingStatus = "skipped"
+)
+
+// Valid indicates whether the value is a known member of the OnboardingStatus enum.
+func (e OnboardingStatus) Valid() bool {
+	switch e {
+	case OnboardingStatusCompleted:
+		return true
+	case OnboardingStatusInvited:
+		return true
+	case OnboardingStatusSkipped:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PageStatus.
 const (
 	PageStatusArchived  PageStatus = "archived"
@@ -423,24 +492,45 @@ func (e SourceType) Valid() bool {
 	}
 }
 
+// Defines values for TaskStatus.
+const (
+	TaskStatusDone    TaskStatus = "done"
+	TaskStatusFailed  TaskStatus = "failed"
+	TaskStatusPending TaskStatus = "pending"
+)
+
+// Valid indicates whether the value is a known member of the TaskStatus enum.
+func (e TaskStatus) Valid() bool {
+	switch e {
+	case TaskStatusDone:
+		return true
+	case TaskStatusFailed:
+		return true
+	case TaskStatusPending:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for UploadStatus.
 const (
-	Completed  UploadStatus = "completed"
-	Failed     UploadStatus = "failed"
-	InProgress UploadStatus = "in_progress"
-	Pending    UploadStatus = "pending"
+	UploadStatusCompleted  UploadStatus = "completed"
+	UploadStatusFailed     UploadStatus = "failed"
+	UploadStatusInProgress UploadStatus = "in_progress"
+	UploadStatusPending    UploadStatus = "pending"
 )
 
 // Valid indicates whether the value is a known member of the UploadStatus enum.
 func (e UploadStatus) Valid() bool {
 	switch e {
-	case Completed:
+	case UploadStatusCompleted:
 		return true
-	case Failed:
+	case UploadStatusFailed:
 		return true
-	case InProgress:
+	case UploadStatusInProgress:
 		return true
-	case Pending:
+	case UploadStatusPending:
 		return true
 	default:
 		return false
@@ -594,6 +684,16 @@ type AssignMemberRequest struct {
 type AvailablePlansResponse struct {
 	// Plans Map of plan code to plan details
 	Plans map[string]PlanDetailsResponse `json:"plans"`
+}
+
+// BackupResponse defines model for BackupResponse.
+type BackupResponse struct {
+	CreatedAt  string  `json:"created_at"`
+	Id         string  `json:"id"`
+	RestoredAt *string `json:"restored_at"`
+	Status     string  `json:"status"`
+	StorageKey *string `json:"storage_key"`
+	TenantId   string  `json:"tenant_id"`
 }
 
 // BillingPortalRequest defines model for BillingPortalRequest.
@@ -766,7 +866,7 @@ type CreateWebflowDestinationRequest struct {
 
 // CustomCollectionBatchItemCreateModel defines model for CustomCollectionBatchItemCreateModel.
 type CustomCollectionBatchItemCreateModel struct {
-	// Items List of items to create
+	// Items List of items to create (max 100 per batch)
 	Items []CustomCollectionItemCreateModel `json:"items"`
 }
 
@@ -867,6 +967,12 @@ type CustomCollectionItemUpdateModel struct {
 	Title *string `json:"title,omitempty"`
 }
 
+// CustomCollectionItemsByIdsModel defines model for CustomCollectionItemsByIdsModel.
+type CustomCollectionItemsByIdsModel struct {
+	// Ids IDs of the items to fetch
+	Ids []string `json:"ids"`
+}
+
 // CustomCollectionResponseModel defines model for CustomCollectionResponseModel.
 type CustomCollectionResponseModel struct {
 	CreatedAt   string                 `json:"created_at"`
@@ -939,6 +1045,9 @@ type DeferredTaskMessage struct {
 	Payload interface{} `json:"payload"`
 	TaskId  string      `json:"task_id"`
 }
+
+// ExportTrigger defines model for ExportTrigger.
+type ExportTrigger string
 
 // ExternalUserRoleKey defines model for ExternalUserRoleKey.
 type ExternalUserRoleKey string
@@ -1064,10 +1173,13 @@ type IssueApiKeyRequest struct {
 	TenantId       string  `json:"tenant_id"`
 }
 
+// JobStatus defines model for JobStatus.
+type JobStatus string
+
 // LoginRequest defines model for LoginRequest.
 type LoginRequest struct {
-	Email    openapi_types.Email `json:"email"`
-	Password string              `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // MicroCopyCreateModel defines model for MicroCopyCreateModel.
@@ -1127,6 +1239,9 @@ type MicroCopyUpdateModel struct {
 	// Value The text content
 	Value *string `json:"value,omitempty"`
 }
+
+// OnboardingStatus defines model for OnboardingStatus.
+type OnboardingStatus string
 
 // Organization defines model for Organization.
 type Organization struct {
@@ -1404,21 +1519,6 @@ type ResumeSubscriptionResponse struct {
 	Status string `json:"status"`
 }
 
-// SearchResultModel defines model for SearchResultModel.
-type SearchResultModel struct {
-	// EntityType Type of entity: 'article', 'page', or 'collection_item'
-	EntityType string `json:"entity_type"`
-	Id         string `json:"id"`
-
-	// ParentId Parent page ID or collection ID
-	ParentId *string `json:"parent_id,omitempty"`
-
-	// ParentName Parent page title or collection name
-	ParentName *string `json:"parent_name,omitempty"`
-	Slug       string  `json:"slug"`
-	Title      string  `json:"title"`
-}
-
 // SourceType defines model for SourceType.
 type SourceType string
 
@@ -1445,6 +1545,9 @@ type SyncDeferredTaskPayload struct {
 	Data     interface{} `json:"data"`
 	TenantId string      `json:"tenant_id"`
 }
+
+// TaskStatus defines model for TaskStatus.
+type TaskStatus string
 
 // Tenant defines model for Tenant.
 type Tenant struct {
@@ -1493,6 +1596,11 @@ type UpdateGripDestinationRequest struct {
 	TracksDestinationName    *string         `json:"tracks_destination_name,omitempty"`
 }
 
+// UpdateOnboardingStatusRequest defines model for UpdateOnboardingStatusRequest.
+type UpdateOnboardingStatusRequest struct {
+	Status OnboardingStatus `json:"status"`
+}
+
 // UpdateOrgRequest defines model for UpdateOrgRequest.
 type UpdateOrgRequest struct {
 	Description *string `json:"description,omitempty"`
@@ -1531,15 +1639,16 @@ type UploadStatus string
 
 // User defines model for User.
 type User struct {
-	AvatarUrl       *string `json:"avatar_url"`
-	CreatedAt       string  `json:"created_at"`
-	Email           string  `json:"email"`
-	FirstName       *string `json:"first_name"`
-	Id              string  `json:"id"`
-	IsEmailVerified bool    `json:"is_email_verified"`
-	LastName        *string `json:"last_name"`
-	Status          string  `json:"status"`
-	UpdatedAt       string  `json:"updated_at"`
+	AvatarUrl        *string `json:"avatar_url"`
+	CreatedAt        string  `json:"created_at"`
+	Email            string  `json:"email"`
+	FirstName        *string `json:"first_name"`
+	Id               string  `json:"id"`
+	IsEmailVerified  bool    `json:"is_email_verified"`
+	LastName         *string `json:"last_name"`
+	OnboardingStatus *string `json:"onboarding_status,omitempty"`
+	Status           string  `json:"status"`
+	UpdatedAt        string  `json:"updated_at"`
 }
 
 // UserWithAuthorization defines model for UserWithAuthorization.
@@ -1586,6 +1695,16 @@ type LoginGithubAuthLoginGithubGetParams struct {
 // ResendActivationAuthResendActivationPostParams defines parameters for ResendActivationAuthResendActivationPost.
 type ResendActivationAuthResendActivationPostParams struct {
 	Email openapi_types.Email `form:"email" json:"email"`
+}
+
+// ListBackupsBackupsGetParams defines parameters for ListBackupsBackupsGet.
+type ListBackupsBackupsGetParams struct {
+	TenantId string `form:"tenant_id" json:"tenant_id"`
+}
+
+// CreateBackupBackupsPostParams defines parameters for CreateBackupBackupsPost.
+type CreateBackupBackupsPostParams struct {
+	TenantId string `form:"tenant_id" json:"tenant_id"`
 }
 
 // StripeWebhookBillingWebhooksStripePostParams defines parameters for StripeWebhookBillingWebhooksStripePost.
@@ -1894,6 +2013,11 @@ type CreateItemManageCustomCollectionsCollectionIdItemsPostParams struct {
 
 // CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams defines parameters for CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPost.
 type CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
+}
+
+// GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams defines parameters for GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost.
+type GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams struct {
 	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
@@ -2211,358 +2335,62 @@ type PreviewInvitationOrgsInvitationsPreviewGetParams struct {
 	Token string `form:"token" json:"token"`
 }
 
-// ListArticlesPublicArticlesGetParams defines parameters for ListArticlesPublicArticlesGet.
-type ListArticlesPublicArticlesGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Category Filter by category ID
-	Category *string `form:"category,omitempty" json:"category,omitempty"`
-
-	// Tag Filter by tag
-	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
-
-	// Keyword Search in title and content
-	Keyword *string `form:"keyword,omitempty" json:"keyword,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
+// ListSyncDestinationsByTenantSyncGetParams defines parameters for ListSyncDestinationsByTenantSyncGet.
+type ListSyncDestinationsByTenantSyncGetParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
-// GetArticleBySlugPublicArticlesBySlugSlugGetParams defines parameters for GetArticleBySlugPublicArticlesBySlugSlugGet.
-type GetArticleBySlugPublicArticlesBySlugSlugGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListArticlesPreviewPublicArticlesPreviewGetParams defines parameters for ListArticlesPreviewPublicArticlesPreviewGet.
-type ListArticlesPreviewPublicArticlesPreviewGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Category Filter by category ID
-	Category *string `form:"category,omitempty" json:"category,omitempty"`
-
-	// Tag Filter by tag
-	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
-
-	// Keyword Search in title and content
-	Keyword *string `form:"keyword,omitempty" json:"keyword,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetArticlePublicArticlesArticleIdGetParams defines parameters for GetArticlePublicArticlesArticleIdGet.
-type GetArticlePublicArticlesArticleIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetTranslationsPublicArticlesArticleIdTranslationsGetParams defines parameters for GetTranslationsPublicArticlesArticleIdTranslationsGet.
-type GetTranslationsPublicArticlesArticleIdTranslationsGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetAvailableLanguagesPublicAvailableLanguagesGetParams defines parameters for GetAvailableLanguagesPublicAvailableLanguagesGet.
-type GetAvailableLanguagesPublicAvailableLanguagesGetParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
-}
-
-// ListCategoriesPublicCategoriesGetParams defines parameters for ListCategoriesPublicCategoriesGet.
-type ListCategoriesPublicCategoriesGetParams struct {
-	// ParentId Filter by parent category ID
-	ParentId *string `form:"parent_id,omitempty" json:"parent_id,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Keyword Search in name and description
-	Keyword *string `form:"keyword,omitempty" json:"keyword,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetCategoryBySlugPublicCategoriesBySlugSlugGetParams defines parameters for GetCategoryBySlugPublicCategoriesBySlugSlugGet.
-type GetCategoryBySlugPublicCategoriesBySlugSlugGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetCategoryPublicCategoriesCategoryIdGetParams defines parameters for GetCategoryPublicCategoriesCategoryIdGet.
-type GetCategoryPublicCategoriesCategoryIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams defines parameters for GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet.
-type GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams defines parameters for GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet.
-type GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams defines parameters for GetTranslationsPublicCategoriesCategoryIdTranslationsGet.
-type GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListCollectionsPublicCustomCollectionsGetParams defines parameters for ListCollectionsPublicCustomCollectionsGet.
-type ListCollectionsPublicCustomCollectionsGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams defines parameters for GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet.
-type GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetCollectionPublicCustomCollectionsCollectionIdGetParams defines parameters for GetCollectionPublicCustomCollectionsCollectionIdGet.
-type GetCollectionPublicCustomCollectionsCollectionIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListItemsPublicCustomCollectionsCollectionIdItemsGetParams defines parameters for ListItemsPublicCustomCollectionsCollectionIdItemsGet.
-type ListItemsPublicCustomCollectionsCollectionIdItemsGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// TranslationOfId Filter by translation source ID
-	TranslationOfId *string `form:"translation_of_id,omitempty" json:"translation_of_id,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams defines parameters for GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet.
-type GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams defines parameters for ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet.
-type ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// TranslationOfId Filter by translation source ID
-	TranslationOfId *string `form:"translation_of_id,omitempty" json:"translation_of_id,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams defines parameters for GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet.
-type GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListMicroCopiesPublicMicroCopyGetParams defines parameters for ListMicroCopiesPublicMicroCopyGet.
-type ListMicroCopiesPublicMicroCopyGetParams struct {
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Tags Filter by tags (comma-separated)
-	Tags    *string `form:"tags,omitempty" json:"tags,omitempty"`
-	XApiKey string  `json:"x-api-key"`
-}
-
-// GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams defines parameters for GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet.
-type GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams struct {
-	// Language Language filter
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-	XApiKey  string  `json:"x-api-key"`
-}
-
-// CountMicroCopiesPublicMicroCopyCountGetParams defines parameters for CountMicroCopiesPublicMicroCopyCountGet.
-type CountMicroCopiesPublicMicroCopyCountGetParams struct {
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Tags Filter by tags (comma-separated)
-	Tags    *string `form:"tags,omitempty" json:"tags,omitempty"`
-	XApiKey string  `json:"x-api-key"`
-}
-
-// GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams defines parameters for GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet.
-type GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams defines parameters for GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet.
-type GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetMicroCopyPublicMicroCopyMicroCopyIdGetParams defines parameters for GetMicroCopyPublicMicroCopyMicroCopyIdGet.
-type GetMicroCopyPublicMicroCopyMicroCopyIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListPagesPublicPagesGetParams defines parameters for ListPagesPublicPagesGet.
-type ListPagesPublicPagesGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Tag Filter by tag
-	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetPageBySlugPublicPagesBySlugSlugGetParams defines parameters for GetPageBySlugPublicPagesBySlugSlugGet.
-type GetPageBySlugPublicPagesBySlugSlugGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// ListPagesPreviewPublicPagesPreviewGetParams defines parameters for ListPagesPreviewPublicPagesPreviewGet.
-type ListPagesPreviewPublicPagesPreviewGetParams struct {
-	// Status Filter by status
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
-
-	// Language Filter by language
-	Language *string `form:"language,omitempty" json:"language,omitempty"`
-
-	// Field Field to sort by
-	Field *string `form:"field,omitempty" json:"field,omitempty"`
-
-	// Order Sort order (asc or desc)
-	Order *string `form:"order,omitempty" json:"order,omitempty"`
-
-	// Tag Filter by tag
-	Tag *string `form:"tag,omitempty" json:"tag,omitempty"`
-
-	// Page Page number starting from 1
-	Page *int `form:"page,omitempty" json:"page,omitempty"`
-
-	// Limit Number of items per page
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
-}
-
-// GetPagePublicPagesPageIdGetParams defines parameters for GetPagePublicPagesPageIdGet.
-type GetPagePublicPagesPageIdGetParams struct {
-	XApiKey string `json:"x-api-key"`
-}
-
-// SearchPublicSearchGetParams defines parameters for SearchPublicSearchGet.
-type SearchPublicSearchGetParams struct {
-	// Keyword Search term
-	Keyword string `form:"keyword" json:"keyword"`
-
-	// Scope Scopes: 'articles', 'pages', 'collections', or a collection UUID
-	Scope *[]string `form:"scope,omitempty" json:"scope,omitempty"`
-
-	// Limit Max results
-	Limit   *int   `form:"limit,omitempty" json:"limit,omitempty"`
-	XApiKey string `json:"x-api-key"`
+// ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams defines parameters for ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet.
+type ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // CreateGripDestinationSyncGripPostParams defines parameters for CreateGripDestinationSyncGripPost.
 type CreateGripDestinationSyncGripPostParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
+}
+
+// ListExportJobsSyncJobsGetParams defines parameters for ListExportJobsSyncJobsGet.
+type ListExportJobsSyncJobsGetParams struct {
+	DestinationId *string        `form:"destination_id,omitempty" json:"destination_id,omitempty"`
+	Status        *JobStatus     `form:"status,omitempty" json:"status,omitempty"`
+	TriggerType   *ExportTrigger `form:"trigger_type,omitempty" json:"trigger_type,omitempty"`
+	Limit         *int           `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset        *int           `form:"offset,omitempty" json:"offset,omitempty"`
+	XTenantID     *string        `json:"X-Tenant-ID,omitempty"`
+}
+
+// GetExportJobSyncJobsJobIdGetParams defines parameters for GetExportJobSyncJobsJobIdGet.
+type GetExportJobSyncJobsJobIdGetParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
+}
+
+// CancelExportJobSyncJobsJobIdCancelPostParams defines parameters for CancelExportJobSyncJobsJobIdCancelPost.
+type CancelExportJobSyncJobsJobIdCancelPostParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
+}
+
+// RetryExportJobSyncJobsJobIdRetryPostParams defines parameters for RetryExportJobSyncJobsJobIdRetryPost.
+type RetryExportJobSyncJobsJobIdRetryPostParams struct {
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
+}
+
+// ListExportJobTasksSyncJobsJobIdTasksGetParams defines parameters for ListExportJobTasksSyncJobsJobIdTasksGet.
+type ListExportJobTasksSyncJobsJobIdTasksGetParams struct {
+	Status    *TaskStatus `form:"status,omitempty" json:"status,omitempty"`
+	Limit     *int        `form:"limit,omitempty" json:"limit,omitempty"`
+	Offset    *int        `form:"offset,omitempty" json:"offset,omitempty"`
+	XTenantID *string     `json:"X-Tenant-ID,omitempty"`
 }
 
 // CreateWebflowDestinationSyncWebflowPostParams defines parameters for CreateWebflowDestinationSyncWebflowPost.
 type CreateWebflowDestinationSyncWebflowPostParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // DeleteSyncDestinationSyncDestinationIdDeleteParams defines parameters for DeleteSyncDestinationSyncDestinationIdDelete.
 type DeleteSyncDestinationSyncDestinationIdDeleteParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // UpdateSyncDestinationConfigSyncDestinationIdPatchJSONBody defines parameters for UpdateSyncDestinationConfigSyncDestinationIdPatch.
@@ -2572,18 +2400,18 @@ type UpdateSyncDestinationConfigSyncDestinationIdPatchJSONBody struct {
 
 // UpdateSyncDestinationConfigSyncDestinationIdPatchParams defines parameters for UpdateSyncDestinationConfigSyncDestinationIdPatch.
 type UpdateSyncDestinationConfigSyncDestinationIdPatchParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // BatchSyncToDestinationSyncDestinationIdBatchPostParams defines parameters for BatchSyncToDestinationSyncDestinationIdBatchPost.
 type BatchSyncToDestinationSyncDestinationIdBatchPostParams struct {
-	TenantId     string `form:"tenant_id" json:"tenant_id"`
-	CollectionId string `form:"collection_id" json:"collection_id"`
+	CollectionId string  `form:"collection_id" json:"collection_id"`
+	XTenantID    *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // ImportFromDestinationSyncDestinationIdImportPostParams defines parameters for ImportFromDestinationSyncDestinationIdImportPost.
 type ImportFromDestinationSyncDestinationIdImportPostParams struct {
-	TenantId string `form:"tenant_id" json:"tenant_id"`
+	XTenantID *string `json:"X-Tenant-ID,omitempty"`
 }
 
 // CreateTenantTenantsPostParams defines parameters for CreateTenantTenantsPost.
@@ -2605,6 +2433,9 @@ type LoginGoogleAuthLoginGooglePostJSONRequestBody = GoogleIdTokenRequest
 
 // LogoutUserAuthLogoutPostJSONRequestBody defines body for LogoutUserAuthLogoutPost for application/json ContentType.
 type LogoutUserAuthLogoutPostJSONRequestBody = RefreshTokenRequest
+
+// SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody defines body for SetMyOnboardingStatusAuthMeOnboardingPatch for application/json ContentType.
+type SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody = UpdateOnboardingStatusRequest
 
 // RefreshAccessTokenAuthRefreshPostJSONRequestBody defines body for RefreshAccessTokenAuthRefreshPost for application/json ContentType.
 type RefreshAccessTokenAuthRefreshPostJSONRequestBody = RefreshTokenRequest
@@ -2677,6 +2508,9 @@ type CreateItemManageCustomCollectionsCollectionIdItemsPostJSONRequestBody = Cus
 
 // CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostJSONRequestBody defines body for CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPost for application/json ContentType.
 type CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostJSONRequestBody = CustomCollectionBatchItemCreateModel
+
+// GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody defines body for GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost for application/json ContentType.
+type GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody = CustomCollectionItemsByIdsModel
 
 // UpdateItemManageCustomCollectionsCollectionIdItemsItemIdPutJSONRequestBody defines body for UpdateItemManageCustomCollectionsCollectionIdItemsItemIdPut for application/json ContentType.
 type UpdateItemManageCustomCollectionsCollectionIdItemsItemIdPutJSONRequestBody = CustomCollectionItemUpdateModel
@@ -2996,6 +2830,11 @@ type ClientInterface interface {
 	// GetMeAuthMeGet request
 	GetMeAuthMeGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// SetMyOnboardingStatusAuthMeOnboardingPatchWithBody request with any body
+	SetMyOnboardingStatusAuthMeOnboardingPatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	SetMyOnboardingStatusAuthMeOnboardingPatch(ctx context.Context, body SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RefreshAccessTokenAuthRefreshPostWithBody request with any body
 	RefreshAccessTokenAuthRefreshPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -3018,6 +2857,18 @@ type ClientInterface interface {
 	ResetPasswordAuthResetPasswordPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ResetPasswordAuthResetPasswordPost(ctx context.Context, body ResetPasswordAuthResetPasswordPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListBackupsBackupsGet request
+	ListBackupsBackupsGet(ctx context.Context, params *ListBackupsBackupsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateBackupBackupsPost request
+	CreateBackupBackupsPost(ctx context.Context, params *CreateBackupBackupsPostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteBackupBackupsBackupIdDelete request
+	DeleteBackupBackupsBackupIdDelete(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RestoreBackupBackupsBackupIdRestorePost request
+	RestoreBackupBackupsBackupIdRestorePost(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateCheckoutSessionBillingCheckoutPostWithBody request with any body
 	CreateCheckoutSessionBillingCheckoutPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3214,6 +3065,11 @@ type ClientInterface interface {
 	CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostWithBody(ctx context.Context, collectionId string, params *CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPost(ctx context.Context, collectionId string, params *CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams, body CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBody request with any body
+	GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBody(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, body GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGet request
 	GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGet(ctx context.Context, collectionId string, slug string, params *GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3415,100 +3271,31 @@ type ClientInterface interface {
 	// RemoveMemberOrgsOrgIdMembersUserIdDelete request
 	RemoveMemberOrgsOrgIdMembersUserIdDelete(ctx context.Context, orgId string, userId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListArticlesPublicArticlesGet request
-	ListArticlesPublicArticlesGet(ctx context.Context, params *ListArticlesPublicArticlesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListSyncDestinationsByTenantSyncGet request
+	ListSyncDestinationsByTenantSyncGet(ctx context.Context, params *ListSyncDestinationsByTenantSyncGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetArticleBySlugPublicArticlesBySlugSlugGet request
-	GetArticleBySlugPublicArticlesBySlugSlugGet(ctx context.Context, slug string, params *GetArticleBySlugPublicArticlesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListArticlesPreviewPublicArticlesPreviewGet request
-	ListArticlesPreviewPublicArticlesPreviewGet(ctx context.Context, params *ListArticlesPreviewPublicArticlesPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetArticlePublicArticlesArticleIdGet request
-	GetArticlePublicArticlesArticleIdGet(ctx context.Context, articleId string, params *GetArticlePublicArticlesArticleIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetTranslationsPublicArticlesArticleIdTranslationsGet request
-	GetTranslationsPublicArticlesArticleIdTranslationsGet(ctx context.Context, articleId string, params *GetTranslationsPublicArticlesArticleIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetAvailableLanguagesPublicAvailableLanguagesGet request
-	GetAvailableLanguagesPublicAvailableLanguagesGet(ctx context.Context, params *GetAvailableLanguagesPublicAvailableLanguagesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListCategoriesPublicCategoriesGet request
-	ListCategoriesPublicCategoriesGet(ctx context.Context, params *ListCategoriesPublicCategoriesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetCategoryBySlugPublicCategoriesBySlugSlugGet request
-	GetCategoryBySlugPublicCategoriesBySlugSlugGet(ctx context.Context, slug string, params *GetCategoryBySlugPublicCategoriesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetCategoryPublicCategoriesCategoryIdGet request
-	GetCategoryPublicCategoriesCategoryIdGet(ctx context.Context, categoryId string, params *GetCategoryPublicCategoriesCategoryIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet request
-	GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet(ctx context.Context, categoryId string, params *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet request
-	GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet(ctx context.Context, categoryId string, params *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetTranslationsPublicCategoriesCategoryIdTranslationsGet request
-	GetTranslationsPublicCategoriesCategoryIdTranslationsGet(ctx context.Context, categoryId string, params *GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListCollectionsPublicCustomCollectionsGet request
-	ListCollectionsPublicCustomCollectionsGet(ctx context.Context, params *ListCollectionsPublicCustomCollectionsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet request
-	GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet(ctx context.Context, slug string, params *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetCollectionPublicCustomCollectionsCollectionIdGet request
-	GetCollectionPublicCustomCollectionsCollectionIdGet(ctx context.Context, collectionId string, params *GetCollectionPublicCustomCollectionsCollectionIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListItemsPublicCustomCollectionsCollectionIdItemsGet request
-	ListItemsPublicCustomCollectionsCollectionIdItemsGet(ctx context.Context, collectionId string, params *ListItemsPublicCustomCollectionsCollectionIdItemsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet request
-	GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet(ctx context.Context, collectionId string, slug string, params *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet request
-	ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet(ctx context.Context, collectionId string, params *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet request
-	GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet(ctx context.Context, collectionId string, itemId string, params *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListMicroCopiesPublicMicroCopyGet request
-	ListMicroCopiesPublicMicroCopyGet(ctx context.Context, params *ListMicroCopiesPublicMicroCopyGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet request
-	GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet(ctx context.Context, key string, params *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CountMicroCopiesPublicMicroCopyCountGet request
-	CountMicroCopiesPublicMicroCopyCountGet(ctx context.Context, params *CountMicroCopiesPublicMicroCopyCountGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet request
-	GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet(ctx context.Context, language string, params *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet request
-	GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet(ctx context.Context, translationOf string, params *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetMicroCopyPublicMicroCopyMicroCopyIdGet request
-	GetMicroCopyPublicMicroCopyMicroCopyIdGet(ctx context.Context, microCopyId string, params *GetMicroCopyPublicMicroCopyMicroCopyIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListPagesPublicPagesGet request
-	ListPagesPublicPagesGet(ctx context.Context, params *ListPagesPublicPagesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetPageBySlugPublicPagesBySlugSlugGet request
-	GetPageBySlugPublicPagesBySlugSlugGet(ctx context.Context, slug string, params *GetPageBySlugPublicPagesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListPagesPreviewPublicPagesPreviewGet request
-	ListPagesPreviewPublicPagesPreviewGet(ctx context.Context, params *ListPagesPreviewPublicPagesPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetPagePublicPagesPageIdGet request
-	GetPagePublicPagesPageIdGet(ctx context.Context, pageId string, params *GetPagePublicPagesPageIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// SearchPublicSearchGet request
-	SearchPublicSearchGet(ctx context.Context, params *SearchPublicSearchGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet request
+	ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet(ctx context.Context, collectionId string, params *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateGripDestinationSyncGripPostWithBody request with any body
 	CreateGripDestinationSyncGripPostWithBody(ctx context.Context, params *CreateGripDestinationSyncGripPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateGripDestinationSyncGripPost(ctx context.Context, params *CreateGripDestinationSyncGripPostParams, body CreateGripDestinationSyncGripPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListExportJobsSyncJobsGet request
+	ListExportJobsSyncJobsGet(ctx context.Context, params *ListExportJobsSyncJobsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetExportJobSyncJobsJobIdGet request
+	GetExportJobSyncJobsJobIdGet(ctx context.Context, jobId string, params *GetExportJobSyncJobsJobIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CancelExportJobSyncJobsJobIdCancelPost request
+	CancelExportJobSyncJobsJobIdCancelPost(ctx context.Context, jobId string, params *CancelExportJobSyncJobsJobIdCancelPostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RetryExportJobSyncJobsJobIdRetryPost request
+	RetryExportJobSyncJobsJobIdRetryPost(ctx context.Context, jobId string, params *RetryExportJobSyncJobsJobIdRetryPostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListExportJobTasksSyncJobsJobIdTasksGet request
+	ListExportJobTasksSyncJobsJobIdTasksGet(ctx context.Context, jobId string, params *ListExportJobTasksSyncJobsJobIdTasksGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateWebflowDestinationSyncWebflowPostWithBody request with any body
 	CreateWebflowDestinationSyncWebflowPostWithBody(ctx context.Context, params *CreateWebflowDestinationSyncWebflowPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3528,12 +3315,6 @@ type ClientInterface interface {
 
 	// ImportFromDestinationSyncDestinationIdImportPostWithBody request with any body
 	ImportFromDestinationSyncDestinationIdImportPostWithBody(ctx context.Context, destinationId string, params *ImportFromDestinationSyncDestinationIdImportPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListSyncDestinationsByTenantSyncTenantIdGet request
-	ListSyncDestinationsByTenantSyncTenantIdGet(ctx context.Context, tenantId string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGet request
-	ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGet(ctx context.Context, tenantId string, collectionId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTenantTenantsPostWithBody request with any body
 	CreateTenantTenantsPostWithBody(ctx context.Context, params *CreateTenantTenantsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3765,6 +3546,30 @@ func (c *Client) GetMeAuthMeGet(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
+func (c *Client) SetMyOnboardingStatusAuthMeOnboardingPatchWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetMyOnboardingStatusAuthMeOnboardingPatchRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetMyOnboardingStatusAuthMeOnboardingPatch(ctx context.Context, body SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetMyOnboardingStatusAuthMeOnboardingPatchRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) RefreshAccessTokenAuthRefreshPostWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRefreshAccessTokenAuthRefreshPostRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -3863,6 +3668,54 @@ func (c *Client) ResetPasswordAuthResetPasswordPostWithBody(ctx context.Context,
 
 func (c *Client) ResetPasswordAuthResetPasswordPost(ctx context.Context, body ResetPasswordAuthResetPasswordPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewResetPasswordAuthResetPasswordPostRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListBackupsBackupsGet(ctx context.Context, params *ListBackupsBackupsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListBackupsBackupsGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateBackupBackupsPost(ctx context.Context, params *CreateBackupBackupsPostParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateBackupBackupsPostRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteBackupBackupsBackupIdDelete(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteBackupBackupsBackupIdDeleteRequest(c.Server, backupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RestoreBackupBackupsBackupIdRestorePost(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRestoreBackupBackupsBackupIdRestorePostRequest(c.Server, backupId)
 	if err != nil {
 		return nil, err
 	}
@@ -4737,6 +4590,30 @@ func (c *Client) CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPo
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBody(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequestWithBody(c.Server, collectionId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, body GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequest(c.Server, collectionId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGet(ctx context.Context, collectionId string, slug string, params *GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetRequest(c.Server, collectionId, slug, params)
 	if err != nil {
@@ -5601,8 +5478,8 @@ func (c *Client) RemoveMemberOrgsOrgIdMembersUserIdDelete(ctx context.Context, o
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListArticlesPublicArticlesGet(ctx context.Context, params *ListArticlesPublicArticlesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListArticlesPublicArticlesGetRequest(c.Server, params)
+func (c *Client) ListSyncDestinationsByTenantSyncGet(ctx context.Context, params *ListSyncDestinationsByTenantSyncGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSyncDestinationsByTenantSyncGetRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5613,344 +5490,8 @@ func (c *Client) ListArticlesPublicArticlesGet(ctx context.Context, params *List
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetArticleBySlugPublicArticlesBySlugSlugGet(ctx context.Context, slug string, params *GetArticleBySlugPublicArticlesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetArticleBySlugPublicArticlesBySlugSlugGetRequest(c.Server, slug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListArticlesPreviewPublicArticlesPreviewGet(ctx context.Context, params *ListArticlesPreviewPublicArticlesPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListArticlesPreviewPublicArticlesPreviewGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetArticlePublicArticlesArticleIdGet(ctx context.Context, articleId string, params *GetArticlePublicArticlesArticleIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetArticlePublicArticlesArticleIdGetRequest(c.Server, articleId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetTranslationsPublicArticlesArticleIdTranslationsGet(ctx context.Context, articleId string, params *GetTranslationsPublicArticlesArticleIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetTranslationsPublicArticlesArticleIdTranslationsGetRequest(c.Server, articleId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetAvailableLanguagesPublicAvailableLanguagesGet(ctx context.Context, params *GetAvailableLanguagesPublicAvailableLanguagesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetAvailableLanguagesPublicAvailableLanguagesGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListCategoriesPublicCategoriesGet(ctx context.Context, params *ListCategoriesPublicCategoriesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListCategoriesPublicCategoriesGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetCategoryBySlugPublicCategoriesBySlugSlugGet(ctx context.Context, slug string, params *GetCategoryBySlugPublicCategoriesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCategoryBySlugPublicCategoriesBySlugSlugGetRequest(c.Server, slug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetCategoryPublicCategoriesCategoryIdGet(ctx context.Context, categoryId string, params *GetCategoryPublicCategoriesCategoryIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCategoryPublicCategoriesCategoryIdGetRequest(c.Server, categoryId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet(ctx context.Context, categoryId string, params *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetRequest(c.Server, categoryId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet(ctx context.Context, categoryId string, params *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetRequest(c.Server, categoryId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetTranslationsPublicCategoriesCategoryIdTranslationsGet(ctx context.Context, categoryId string, params *GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetTranslationsPublicCategoriesCategoryIdTranslationsGetRequest(c.Server, categoryId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListCollectionsPublicCustomCollectionsGet(ctx context.Context, params *ListCollectionsPublicCustomCollectionsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListCollectionsPublicCustomCollectionsGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet(ctx context.Context, slug string, params *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetRequest(c.Server, slug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetCollectionPublicCustomCollectionsCollectionIdGet(ctx context.Context, collectionId string, params *GetCollectionPublicCustomCollectionsCollectionIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCollectionPublicCustomCollectionsCollectionIdGetRequest(c.Server, collectionId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListItemsPublicCustomCollectionsCollectionIdItemsGet(ctx context.Context, collectionId string, params *ListItemsPublicCustomCollectionsCollectionIdItemsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListItemsPublicCustomCollectionsCollectionIdItemsGetRequest(c.Server, collectionId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet(ctx context.Context, collectionId string, slug string, params *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetRequest(c.Server, collectionId, slug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet(ctx context.Context, collectionId string, params *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetRequest(c.Server, collectionId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet(ctx context.Context, collectionId string, itemId string, params *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetRequest(c.Server, collectionId, itemId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListMicroCopiesPublicMicroCopyGet(ctx context.Context, params *ListMicroCopiesPublicMicroCopyGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListMicroCopiesPublicMicroCopyGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet(ctx context.Context, key string, params *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetRequest(c.Server, key, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CountMicroCopiesPublicMicroCopyCountGet(ctx context.Context, params *CountMicroCopiesPublicMicroCopyCountGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCountMicroCopiesPublicMicroCopyCountGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet(ctx context.Context, language string, params *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetRequest(c.Server, language, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet(ctx context.Context, translationOf string, params *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetRequest(c.Server, translationOf, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetMicroCopyPublicMicroCopyMicroCopyIdGet(ctx context.Context, microCopyId string, params *GetMicroCopyPublicMicroCopyMicroCopyIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetMicroCopyPublicMicroCopyMicroCopyIdGetRequest(c.Server, microCopyId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListPagesPublicPagesGet(ctx context.Context, params *ListPagesPublicPagesGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListPagesPublicPagesGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetPageBySlugPublicPagesBySlugSlugGet(ctx context.Context, slug string, params *GetPageBySlugPublicPagesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetPageBySlugPublicPagesBySlugSlugGetRequest(c.Server, slug, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListPagesPreviewPublicPagesPreviewGet(ctx context.Context, params *ListPagesPreviewPublicPagesPreviewGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListPagesPreviewPublicPagesPreviewGetRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetPagePublicPagesPageIdGet(ctx context.Context, pageId string, params *GetPagePublicPagesPageIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetPagePublicPagesPageIdGetRequest(c.Server, pageId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SearchPublicSearchGet(ctx context.Context, params *SearchPublicSearchGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSearchPublicSearchGetRequest(c.Server, params)
+func (c *Client) ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet(ctx context.Context, collectionId string, params *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetRequest(c.Server, collectionId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5975,6 +5516,66 @@ func (c *Client) CreateGripDestinationSyncGripPostWithBody(ctx context.Context, 
 
 func (c *Client) CreateGripDestinationSyncGripPost(ctx context.Context, params *CreateGripDestinationSyncGripPostParams, body CreateGripDestinationSyncGripPostJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateGripDestinationSyncGripPostRequest(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListExportJobsSyncJobsGet(ctx context.Context, params *ListExportJobsSyncJobsGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListExportJobsSyncJobsGetRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetExportJobSyncJobsJobIdGet(ctx context.Context, jobId string, params *GetExportJobSyncJobsJobIdGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetExportJobSyncJobsJobIdGetRequest(c.Server, jobId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CancelExportJobSyncJobsJobIdCancelPost(ctx context.Context, jobId string, params *CancelExportJobSyncJobsJobIdCancelPostParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCancelExportJobSyncJobsJobIdCancelPostRequest(c.Server, jobId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RetryExportJobSyncJobsJobIdRetryPost(ctx context.Context, jobId string, params *RetryExportJobSyncJobsJobIdRetryPostParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetryExportJobSyncJobsJobIdRetryPostRequest(c.Server, jobId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListExportJobTasksSyncJobsJobIdTasksGet(ctx context.Context, jobId string, params *ListExportJobTasksSyncJobsJobIdTasksGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListExportJobTasksSyncJobsJobIdTasksGetRequest(c.Server, jobId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6059,30 +5660,6 @@ func (c *Client) BatchSyncToDestinationSyncDestinationIdBatchPost(ctx context.Co
 
 func (c *Client) ImportFromDestinationSyncDestinationIdImportPostWithBody(ctx context.Context, destinationId string, params *ImportFromDestinationSyncDestinationIdImportPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewImportFromDestinationSyncDestinationIdImportPostRequestWithBody(c.Server, destinationId, params, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListSyncDestinationsByTenantSyncTenantIdGet(ctx context.Context, tenantId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListSyncDestinationsByTenantSyncTenantIdGetRequest(c.Server, tenantId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGet(ctx context.Context, tenantId string, collectionId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetRequest(c.Server, tenantId, collectionId)
 	if err != nil {
 		return nil, err
 	}
@@ -6678,6 +6255,46 @@ func NewGetMeAuthMeGetRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewSetMyOnboardingStatusAuthMeOnboardingPatchRequest calls the generic SetMyOnboardingStatusAuthMeOnboardingPatch builder with application/json body
+func NewSetMyOnboardingStatusAuthMeOnboardingPatchRequest(server string, body SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSetMyOnboardingStatusAuthMeOnboardingPatchRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewSetMyOnboardingStatusAuthMeOnboardingPatchRequestWithBody generates requests for SetMyOnboardingStatusAuthMeOnboardingPatch with any type of body
+func NewSetMyOnboardingStatusAuthMeOnboardingPatchRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/me/onboarding")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewRefreshAccessTokenAuthRefreshPostRequest calls the generic RefreshAccessTokenAuthRefreshPost builder with application/json body
 func NewRefreshAccessTokenAuthRefreshPostRequest(server string, body RefreshAccessTokenAuthRefreshPostJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -6879,6 +6496,164 @@ func NewResetPasswordAuthResetPasswordPostRequestWithBody(server string, content
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListBackupsBackupsGetRequest generates requests for ListBackupsBackupsGet
+func NewListBackupsBackupsGetRequest(server string, params *ListBackupsBackupsGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateBackupBackupsPostRequest generates requests for CreateBackupBackupsPost
+func NewCreateBackupBackupsPostRequest(server string, params *CreateBackupBackupsPostParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteBackupBackupsBackupIdDeleteRequest generates requests for DeleteBackupBackupsBackupIdDelete
+func NewDeleteBackupBackupsBackupIdDeleteRequest(server string, backupId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "backup_id", backupId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRestoreBackupBackupsBackupIdRestorePostRequest generates requests for RestoreBackupBackupsBackupIdRestorePost
+func NewRestoreBackupBackupsBackupIdRestorePostRequest(server string, backupId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "backup_id", backupId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/backups/%s/restore", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -10040,6 +9815,68 @@ func NewCreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostRequest
 	}
 
 	operationPath := fmt.Sprintf("/manage/custom-collections/%s/items/batch", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequest calls the generic GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost builder with application/json body
+func NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequest(server string, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, body GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequestWithBody(server, collectionId, params, "application/json", bodyReader)
+}
+
+// NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequestWithBody generates requests for GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost with any type of body
+func NewGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostRequestWithBody(server string, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/manage/custom-collections/%s/items/by-ids", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13452,8 +13289,8 @@ func NewRemoveMemberOrgsOrgIdMembersUserIdDeleteRequest(server string, orgId str
 	return req, nil
 }
 
-// NewListArticlesPublicArticlesGetRequest generates requests for ListArticlesPublicArticlesGet
-func NewListArticlesPublicArticlesGetRequest(server string, params *ListArticlesPublicArticlesGetParams) (*http.Request, error) {
+// NewListSyncDestinationsByTenantSyncGetRequest generates requests for ListSyncDestinationsByTenantSyncGet
+func NewListSyncDestinationsByTenantSyncGetRequest(server string, params *ListSyncDestinationsByTenantSyncGetParams) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -13461,204 +13298,7 @@ func NewListArticlesPublicArticlesGetRequest(server string, params *ListArticles
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/public/articles")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Category != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "category", *params.Category, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tag != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", *params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Keyword != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "keyword", *params.Keyword, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetArticleBySlugPublicArticlesBySlugSlugGetRequest generates requests for GetArticleBySlugPublicArticlesBySlugSlugGet
-func NewGetArticleBySlugPublicArticlesBySlugSlugGetRequest(server string, slug string, params *GetArticleBySlugPublicArticlesBySlugSlugGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "slug", slug, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/articles/by-slug/%s", pathParam0)
+	operationPath := fmt.Sprintf("/sync")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13675,933 +13315,24 @@ func NewGetArticleBySlugPublicArticlesBySlugSlugGetRequest(server string, slug s
 
 	if params != nil {
 
-		var headerParam0 string
+		if params.XTenantID != nil {
+			var headerParam0 string
 
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
 		}
-
-		req.Header.Set("x-api-key", headerParam0)
 
 	}
 
 	return req, nil
 }
 
-// NewListArticlesPreviewPublicArticlesPreviewGetRequest generates requests for ListArticlesPreviewPublicArticlesPreviewGet
-func NewListArticlesPreviewPublicArticlesPreviewGetRequest(server string, params *ListArticlesPreviewPublicArticlesPreviewGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/articles/preview")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Category != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "category", *params.Category, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tag != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", *params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Keyword != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "keyword", *params.Keyword, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetArticlePublicArticlesArticleIdGetRequest generates requests for GetArticlePublicArticlesArticleIdGet
-func NewGetArticlePublicArticlesArticleIdGetRequest(server string, articleId string, params *GetArticlePublicArticlesArticleIdGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "article_id", articleId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/articles/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetTranslationsPublicArticlesArticleIdTranslationsGetRequest generates requests for GetTranslationsPublicArticlesArticleIdTranslationsGet
-func NewGetTranslationsPublicArticlesArticleIdTranslationsGetRequest(server string, articleId string, params *GetTranslationsPublicArticlesArticleIdTranslationsGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "article_id", articleId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/articles/%s/translations", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetAvailableLanguagesPublicAvailableLanguagesGetRequest generates requests for GetAvailableLanguagesPublicAvailableLanguagesGet
-func NewGetAvailableLanguagesPublicAvailableLanguagesGetRequest(server string, params *GetAvailableLanguagesPublicAvailableLanguagesGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/available-languages")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewListCategoriesPublicCategoriesGetRequest generates requests for ListCategoriesPublicCategoriesGet
-func NewListCategoriesPublicCategoriesGetRequest(server string, params *ListCategoriesPublicCategoriesGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.ParentId != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "parent_id", *params.ParentId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Keyword != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "keyword", *params.Keyword, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetCategoryBySlugPublicCategoriesBySlugSlugGetRequest generates requests for GetCategoryBySlugPublicCategoriesBySlugSlugGet
-func NewGetCategoryBySlugPublicCategoriesBySlugSlugGetRequest(server string, slug string, params *GetCategoryBySlugPublicCategoriesBySlugSlugGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "slug", slug, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories/by-slug/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetCategoryPublicCategoriesCategoryIdGetRequest generates requests for GetCategoryPublicCategoriesCategoryIdGet
-func NewGetCategoryPublicCategoriesCategoryIdGetRequest(server string, categoryId string, params *GetCategoryPublicCategoriesCategoryIdGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "category_id", categoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetRequest generates requests for GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet
-func NewGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetRequest(server string, categoryId string, params *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "category_id", categoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories/%s/articles", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetRequest generates requests for GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet
-func NewGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetRequest(server string, categoryId string, params *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "category_id", categoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories/%s/subcategories", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetTranslationsPublicCategoriesCategoryIdTranslationsGetRequest generates requests for GetTranslationsPublicCategoriesCategoryIdTranslationsGet
-func NewGetTranslationsPublicCategoriesCategoryIdTranslationsGetRequest(server string, categoryId string, params *GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "category_id", categoryId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/categories/%s/translations", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListCollectionsPublicCustomCollectionsGetRequest generates requests for ListCollectionsPublicCustomCollectionsGet
-func NewListCollectionsPublicCustomCollectionsGetRequest(server string, params *ListCollectionsPublicCustomCollectionsGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetRequest generates requests for GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet
-func NewGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetRequest(server string, slug string, params *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "slug", slug, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections/by-slug/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetCollectionPublicCustomCollectionsCollectionIdGetRequest generates requests for GetCollectionPublicCustomCollectionsCollectionIdGet
-func NewGetCollectionPublicCustomCollectionsCollectionIdGetRequest(server string, collectionId string, params *GetCollectionPublicCustomCollectionsCollectionIdGetParams) (*http.Request, error) {
+// NewListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetRequest generates requests for ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet
+func NewListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetRequest(server string, collectionId string, params *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -14616,7 +13347,7 @@ func NewGetCollectionPublicCustomCollectionsCollectionIdGetRequest(server string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/public/custom-collections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/sync/by-collection/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14633,1318 +13364,16 @@ func NewGetCollectionPublicCustomCollectionsCollectionIdGetRequest(server string
 
 	if params != nil {
 
-		var headerParam0 string
+		if params.XTenantID != nil {
+			var headerParam0 string
 
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListItemsPublicCustomCollectionsCollectionIdItemsGetRequest generates requests for ListItemsPublicCustomCollectionsCollectionIdItemsGet
-func NewListItemsPublicCustomCollectionsCollectionIdItemsGetRequest(server string, collectionId string, params *ListItemsPublicCustomCollectionsCollectionIdItemsGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections/%s/items", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
 				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
 			}
 
+			req.Header.Set("X-Tenant-ID", headerParam0)
 		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.TranslationOfId != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "translation_of_id", *params.TranslationOfId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetRequest generates requests for GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet
-func NewGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetRequest(server string, collectionId string, slug string, params *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithOptions("simple", false, "slug", slug, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections/%s/items/by-slug/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetRequest generates requests for ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet
-func NewListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetRequest(server string, collectionId string, params *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections/%s/items/preview", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.TranslationOfId != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "translation_of_id", *params.TranslationOfId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetRequest generates requests for GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet
-func NewGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetRequest(server string, collectionId string, itemId string, params *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithOptions("simple", false, "item_id", itemId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/custom-collections/%s/items/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListMicroCopiesPublicMicroCopyGetRequest generates requests for ListMicroCopiesPublicMicroCopyGet
-func NewListMicroCopiesPublicMicroCopyGetRequest(server string, params *ListMicroCopiesPublicMicroCopyGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tags != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tags", *params.Tags, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetRequest generates requests for GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet
-func NewGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetRequest(server string, key string, params *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "key", key, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy/by-key/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewCountMicroCopiesPublicMicroCopyCountGetRequest generates requests for CountMicroCopiesPublicMicroCopyCountGet
-func NewCountMicroCopiesPublicMicroCopyCountGetRequest(server string, params *CountMicroCopiesPublicMicroCopyCountGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy/count")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tags != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tags", *params.Tags, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetRequest generates requests for GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet
-func NewGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetRequest(server string, language string, params *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "language", language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy/language/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetRequest generates requests for GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet
-func NewGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetRequest(server string, translationOf string, params *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "translation_of", translationOf, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy/translations/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetMicroCopyPublicMicroCopyMicroCopyIdGetRequest generates requests for GetMicroCopyPublicMicroCopyMicroCopyIdGet
-func NewGetMicroCopyPublicMicroCopyMicroCopyIdGetRequest(server string, microCopyId string, params *GetMicroCopyPublicMicroCopyMicroCopyIdGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "micro_copy_id", microCopyId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/micro-copy/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListPagesPublicPagesGetRequest generates requests for ListPagesPublicPagesGet
-func NewListPagesPublicPagesGetRequest(server string, params *ListPagesPublicPagesGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/pages")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tag != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", *params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetPageBySlugPublicPagesBySlugSlugGetRequest generates requests for GetPageBySlugPublicPagesBySlugSlugGet
-func NewGetPageBySlugPublicPagesBySlugSlugGetRequest(server string, slug string, params *GetPageBySlugPublicPagesBySlugSlugGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "slug", slug, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/pages/by-slug/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewListPagesPreviewPublicPagesPreviewGetRequest generates requests for ListPagesPreviewPublicPagesPreviewGet
-func NewListPagesPreviewPublicPagesPreviewGetRequest(server string, params *ListPagesPreviewPublicPagesPreviewGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/pages/preview")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Status != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Language != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "language", *params.Language, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Field != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "field", *params.Field, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "order", *params.Order, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Tag != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tag", *params.Tag, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Page != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "page", *params.Page, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewGetPagePublicPagesPageIdGetRequest generates requests for GetPagePublicPagesPageIdGet
-func NewGetPagePublicPagesPageIdGetRequest(server string, pageId string, params *GetPagePublicPagesPageIdGetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "page_id", pageId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/pages/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
-
-	}
-
-	return req, nil
-}
-
-// NewSearchPublicSearchGetRequest generates requests for SearchPublicSearchGet
-func NewSearchPublicSearchGetRequest(server string, params *SearchPublicSearchGetParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/public/search")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "keyword", params.Keyword, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		if params.Scope != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "scope", *params.Scope, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "array", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithOptions("simple", false, "x-api-key", params.XApiKey, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("x-api-key", headerParam0)
 
 	}
 
@@ -15981,30 +13410,405 @@ func NewCreateGripDestinationSyncGripPostRequestWithBody(server string, params *
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
 	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewListExportJobsSyncJobsGetRequest generates requests for ListExportJobsSyncJobsGet
+func NewListExportJobsSyncJobsGetRequest(server string, params *ListExportJobsSyncJobsGetParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync/jobs")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.DestinationId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "destination_id", *params.DestinationId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Status != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.TriggerType != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "trigger_type", *params.TriggerType, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "offset", *params.Offset, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewGetExportJobSyncJobsJobIdGetRequest generates requests for GetExportJobSyncJobsJobIdGet
+func NewGetExportJobSyncJobsJobIdGetRequest(server string, jobId string, params *GetExportJobSyncJobsJobIdGetParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "job_id", jobId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync/jobs/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewCancelExportJobSyncJobsJobIdCancelPostRequest generates requests for CancelExportJobSyncJobsJobIdCancelPost
+func NewCancelExportJobSyncJobsJobIdCancelPostRequest(server string, jobId string, params *CancelExportJobSyncJobsJobIdCancelPostParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "job_id", jobId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync/jobs/%s/cancel", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewRetryExportJobSyncJobsJobIdRetryPostRequest generates requests for RetryExportJobSyncJobsJobIdRetryPost
+func NewRetryExportJobSyncJobsJobIdRetryPostRequest(server string, jobId string, params *RetryExportJobSyncJobsJobIdRetryPostParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "job_id", jobId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync/jobs/%s/retry", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
+
+	return req, nil
+}
+
+// NewListExportJobTasksSyncJobsJobIdTasksGetRequest generates requests for ListExportJobTasksSyncJobsJobIdTasksGet
+func NewListExportJobTasksSyncJobsJobIdTasksGetRequest(server string, jobId string, params *ListExportJobTasksSyncJobsJobIdTasksGetParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "job_id", jobId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync/jobs/%s/tasks", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Status != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "status", *params.Status, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "limit", *params.Limit, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Offset != nil {
+
+			if queryFrag, err := runtime.StyleParamWithOptions("form", true, "offset", *params.Offset, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "integer", Format: ""}); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
@@ -16039,30 +13843,27 @@ func NewCreateWebflowDestinationSyncWebflowPostRequestWithBody(server string, pa
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
 	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
@@ -16093,27 +13894,24 @@ func NewDeleteSyncDestinationSyncDestinationIdDeleteRequest(server string, desti
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
 	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
 	}
 
 	return req, nil
@@ -16156,30 +13954,27 @@ func NewUpdateSyncDestinationConfigSyncDestinationIdPatchRequestWithBody(server 
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
 	req, err := http.NewRequest("PATCH", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
@@ -16213,18 +14008,6 @@ func NewBatchSyncToDestinationSyncDestinationIdBatchPostRequest(server string, d
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
 		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "collection_id", params.CollectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
@@ -16243,6 +14026,21 @@ func NewBatchSyncToDestinationSyncDestinationIdBatchPostRequest(server string, d
 	req, err := http.NewRequest("POST", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+
+	if params != nil {
+
+		if params.XTenantID != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
+
 	}
 
 	return req, nil
@@ -16274,24 +14072,6 @@ func NewImportFromDestinationSyncDestinationIdImportPostRequestWithBody(server s
 		return nil, err
 	}
 
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithOptions("form", true, "tenant_id", params.TenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationQuery, Type: "string", Format: ""}); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
 	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
@@ -16299,79 +14079,19 @@ func NewImportFromDestinationSyncDestinationIdImportPostRequestWithBody(server s
 
 	req.Header.Add("Content-Type", contentType)
 
-	return req, nil
-}
+	if params != nil {
 
-// NewListSyncDestinationsByTenantSyncTenantIdGetRequest generates requests for ListSyncDestinationsByTenantSyncTenantIdGet
-func NewListSyncDestinationsByTenantSyncTenantIdGetRequest(server string, tenantId string) (*http.Request, error) {
-	var err error
+		if params.XTenantID != nil {
+			var headerParam0 string
 
-	var pathParam0 string
+			headerParam0, err = runtime.StyleParamWithOptions("simple", false, "X-Tenant-ID", *params.XTenantID, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+			if err != nil {
+				return nil, err
+			}
 
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "tenant_id", tenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
+			req.Header.Set("X-Tenant-ID", headerParam0)
+		}
 
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/sync/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetRequest generates requests for ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGet
-func NewListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetRequest(server string, tenantId string, collectionId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "tenant_id", tenantId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithOptions("simple", false, "collection_id", collectionId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: ""})
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/sync/%s/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
 	}
 
 	return req, nil
@@ -16734,6 +14454,11 @@ type ClientWithResponsesInterface interface {
 	// GetMeAuthMeGetWithResponse request
 	GetMeAuthMeGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMeAuthMeGetResponse, error)
 
+	// SetMyOnboardingStatusAuthMeOnboardingPatchWithBodyWithResponse request with any body
+	SetMyOnboardingStatusAuthMeOnboardingPatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetMyOnboardingStatusAuthMeOnboardingPatchResponse, error)
+
+	SetMyOnboardingStatusAuthMeOnboardingPatchWithResponse(ctx context.Context, body SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody, reqEditors ...RequestEditorFn) (*SetMyOnboardingStatusAuthMeOnboardingPatchResponse, error)
+
 	// RefreshAccessTokenAuthRefreshPostWithBodyWithResponse request with any body
 	RefreshAccessTokenAuthRefreshPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RefreshAccessTokenAuthRefreshPostResponse, error)
 
@@ -16756,6 +14481,18 @@ type ClientWithResponsesInterface interface {
 	ResetPasswordAuthResetPasswordPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResetPasswordAuthResetPasswordPostResponse, error)
 
 	ResetPasswordAuthResetPasswordPostWithResponse(ctx context.Context, body ResetPasswordAuthResetPasswordPostJSONRequestBody, reqEditors ...RequestEditorFn) (*ResetPasswordAuthResetPasswordPostResponse, error)
+
+	// ListBackupsBackupsGetWithResponse request
+	ListBackupsBackupsGetWithResponse(ctx context.Context, params *ListBackupsBackupsGetParams, reqEditors ...RequestEditorFn) (*ListBackupsBackupsGetResponse, error)
+
+	// CreateBackupBackupsPostWithResponse request
+	CreateBackupBackupsPostWithResponse(ctx context.Context, params *CreateBackupBackupsPostParams, reqEditors ...RequestEditorFn) (*CreateBackupBackupsPostResponse, error)
+
+	// DeleteBackupBackupsBackupIdDeleteWithResponse request
+	DeleteBackupBackupsBackupIdDeleteWithResponse(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*DeleteBackupBackupsBackupIdDeleteResponse, error)
+
+	// RestoreBackupBackupsBackupIdRestorePostWithResponse request
+	RestoreBackupBackupsBackupIdRestorePostWithResponse(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*RestoreBackupBackupsBackupIdRestorePostResponse, error)
 
 	// CreateCheckoutSessionBillingCheckoutPostWithBodyWithResponse request with any body
 	CreateCheckoutSessionBillingCheckoutPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCheckoutSessionBillingCheckoutPostResponse, error)
@@ -16952,6 +14689,11 @@ type ClientWithResponsesInterface interface {
 	CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostWithBodyWithResponse(ctx context.Context, collectionId string, params *CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostResponse, error)
 
 	CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostWithResponse(ctx context.Context, collectionId string, params *CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostParams, body CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostResponse, error)
+
+	// GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBodyWithResponse request with any body
+	GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBodyWithResponse(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse, error)
+
+	GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithResponse(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, body GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse, error)
 
 	// GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse request
 	GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse(ctx context.Context, collectionId string, slug string, params *GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetResponse, error)
@@ -17153,100 +14895,31 @@ type ClientWithResponsesInterface interface {
 	// RemoveMemberOrgsOrgIdMembersUserIdDeleteWithResponse request
 	RemoveMemberOrgsOrgIdMembersUserIdDeleteWithResponse(ctx context.Context, orgId string, userId string, reqEditors ...RequestEditorFn) (*RemoveMemberOrgsOrgIdMembersUserIdDeleteResponse, error)
 
-	// ListArticlesPublicArticlesGetWithResponse request
-	ListArticlesPublicArticlesGetWithResponse(ctx context.Context, params *ListArticlesPublicArticlesGetParams, reqEditors ...RequestEditorFn) (*ListArticlesPublicArticlesGetResponse, error)
+	// ListSyncDestinationsByTenantSyncGetWithResponse request
+	ListSyncDestinationsByTenantSyncGetWithResponse(ctx context.Context, params *ListSyncDestinationsByTenantSyncGetParams, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByTenantSyncGetResponse, error)
 
-	// GetArticleBySlugPublicArticlesBySlugSlugGetWithResponse request
-	GetArticleBySlugPublicArticlesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetArticleBySlugPublicArticlesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetArticleBySlugPublicArticlesBySlugSlugGetResponse, error)
-
-	// ListArticlesPreviewPublicArticlesPreviewGetWithResponse request
-	ListArticlesPreviewPublicArticlesPreviewGetWithResponse(ctx context.Context, params *ListArticlesPreviewPublicArticlesPreviewGetParams, reqEditors ...RequestEditorFn) (*ListArticlesPreviewPublicArticlesPreviewGetResponse, error)
-
-	// GetArticlePublicArticlesArticleIdGetWithResponse request
-	GetArticlePublicArticlesArticleIdGetWithResponse(ctx context.Context, articleId string, params *GetArticlePublicArticlesArticleIdGetParams, reqEditors ...RequestEditorFn) (*GetArticlePublicArticlesArticleIdGetResponse, error)
-
-	// GetTranslationsPublicArticlesArticleIdTranslationsGetWithResponse request
-	GetTranslationsPublicArticlesArticleIdTranslationsGetWithResponse(ctx context.Context, articleId string, params *GetTranslationsPublicArticlesArticleIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*GetTranslationsPublicArticlesArticleIdTranslationsGetResponse, error)
-
-	// GetAvailableLanguagesPublicAvailableLanguagesGetWithResponse request
-	GetAvailableLanguagesPublicAvailableLanguagesGetWithResponse(ctx context.Context, params *GetAvailableLanguagesPublicAvailableLanguagesGetParams, reqEditors ...RequestEditorFn) (*GetAvailableLanguagesPublicAvailableLanguagesGetResponse, error)
-
-	// ListCategoriesPublicCategoriesGetWithResponse request
-	ListCategoriesPublicCategoriesGetWithResponse(ctx context.Context, params *ListCategoriesPublicCategoriesGetParams, reqEditors ...RequestEditorFn) (*ListCategoriesPublicCategoriesGetResponse, error)
-
-	// GetCategoryBySlugPublicCategoriesBySlugSlugGetWithResponse request
-	GetCategoryBySlugPublicCategoriesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetCategoryBySlugPublicCategoriesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse, error)
-
-	// GetCategoryPublicCategoriesCategoryIdGetWithResponse request
-	GetCategoryPublicCategoriesCategoryIdGetWithResponse(ctx context.Context, categoryId string, params *GetCategoryPublicCategoriesCategoryIdGetParams, reqEditors ...RequestEditorFn) (*GetCategoryPublicCategoriesCategoryIdGetResponse, error)
-
-	// GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetWithResponse request
-	GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetWithResponse(ctx context.Context, categoryId string, params *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams, reqEditors ...RequestEditorFn) (*GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse, error)
-
-	// GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetWithResponse request
-	GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetWithResponse(ctx context.Context, categoryId string, params *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams, reqEditors ...RequestEditorFn) (*GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse, error)
-
-	// GetTranslationsPublicCategoriesCategoryIdTranslationsGetWithResponse request
-	GetTranslationsPublicCategoriesCategoryIdTranslationsGetWithResponse(ctx context.Context, categoryId string, params *GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse, error)
-
-	// ListCollectionsPublicCustomCollectionsGetWithResponse request
-	ListCollectionsPublicCustomCollectionsGetWithResponse(ctx context.Context, params *ListCollectionsPublicCustomCollectionsGetParams, reqEditors ...RequestEditorFn) (*ListCollectionsPublicCustomCollectionsGetResponse, error)
-
-	// GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetWithResponse request
-	GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse, error)
-
-	// GetCollectionPublicCustomCollectionsCollectionIdGetWithResponse request
-	GetCollectionPublicCustomCollectionsCollectionIdGetWithResponse(ctx context.Context, collectionId string, params *GetCollectionPublicCustomCollectionsCollectionIdGetParams, reqEditors ...RequestEditorFn) (*GetCollectionPublicCustomCollectionsCollectionIdGetResponse, error)
-
-	// ListItemsPublicCustomCollectionsCollectionIdItemsGetWithResponse request
-	ListItemsPublicCustomCollectionsCollectionIdItemsGetWithResponse(ctx context.Context, collectionId string, params *ListItemsPublicCustomCollectionsCollectionIdItemsGetParams, reqEditors ...RequestEditorFn) (*ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse, error)
-
-	// GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse request
-	GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse(ctx context.Context, collectionId string, slug string, params *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse, error)
-
-	// ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetWithResponse request
-	ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetWithResponse(ctx context.Context, collectionId string, params *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams, reqEditors ...RequestEditorFn) (*ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse, error)
-
-	// GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetWithResponse request
-	GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetWithResponse(ctx context.Context, collectionId string, itemId string, params *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams, reqEditors ...RequestEditorFn) (*GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse, error)
-
-	// ListMicroCopiesPublicMicroCopyGetWithResponse request
-	ListMicroCopiesPublicMicroCopyGetWithResponse(ctx context.Context, params *ListMicroCopiesPublicMicroCopyGetParams, reqEditors ...RequestEditorFn) (*ListMicroCopiesPublicMicroCopyGetResponse, error)
-
-	// GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetWithResponse request
-	GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetWithResponse(ctx context.Context, key string, params *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse, error)
-
-	// CountMicroCopiesPublicMicroCopyCountGetWithResponse request
-	CountMicroCopiesPublicMicroCopyCountGetWithResponse(ctx context.Context, params *CountMicroCopiesPublicMicroCopyCountGetParams, reqEditors ...RequestEditorFn) (*CountMicroCopiesPublicMicroCopyCountGetResponse, error)
-
-	// GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetWithResponse request
-	GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetWithResponse(ctx context.Context, language string, params *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse, error)
-
-	// GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetWithResponse request
-	GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetWithResponse(ctx context.Context, translationOf string, params *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse, error)
-
-	// GetMicroCopyPublicMicroCopyMicroCopyIdGetWithResponse request
-	GetMicroCopyPublicMicroCopyMicroCopyIdGetWithResponse(ctx context.Context, microCopyId string, params *GetMicroCopyPublicMicroCopyMicroCopyIdGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse, error)
-
-	// ListPagesPublicPagesGetWithResponse request
-	ListPagesPublicPagesGetWithResponse(ctx context.Context, params *ListPagesPublicPagesGetParams, reqEditors ...RequestEditorFn) (*ListPagesPublicPagesGetResponse, error)
-
-	// GetPageBySlugPublicPagesBySlugSlugGetWithResponse request
-	GetPageBySlugPublicPagesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetPageBySlugPublicPagesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetPageBySlugPublicPagesBySlugSlugGetResponse, error)
-
-	// ListPagesPreviewPublicPagesPreviewGetWithResponse request
-	ListPagesPreviewPublicPagesPreviewGetWithResponse(ctx context.Context, params *ListPagesPreviewPublicPagesPreviewGetParams, reqEditors ...RequestEditorFn) (*ListPagesPreviewPublicPagesPreviewGetResponse, error)
-
-	// GetPagePublicPagesPageIdGetWithResponse request
-	GetPagePublicPagesPageIdGetWithResponse(ctx context.Context, pageId string, params *GetPagePublicPagesPageIdGetParams, reqEditors ...RequestEditorFn) (*GetPagePublicPagesPageIdGetResponse, error)
-
-	// SearchPublicSearchGetWithResponse request
-	SearchPublicSearchGetWithResponse(ctx context.Context, params *SearchPublicSearchGetParams, reqEditors ...RequestEditorFn) (*SearchPublicSearchGetResponse, error)
+	// ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetWithResponse request
+	ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetWithResponse(ctx context.Context, collectionId string, params *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse, error)
 
 	// CreateGripDestinationSyncGripPostWithBodyWithResponse request with any body
 	CreateGripDestinationSyncGripPostWithBodyWithResponse(ctx context.Context, params *CreateGripDestinationSyncGripPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateGripDestinationSyncGripPostResponse, error)
 
 	CreateGripDestinationSyncGripPostWithResponse(ctx context.Context, params *CreateGripDestinationSyncGripPostParams, body CreateGripDestinationSyncGripPostJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateGripDestinationSyncGripPostResponse, error)
+
+	// ListExportJobsSyncJobsGetWithResponse request
+	ListExportJobsSyncJobsGetWithResponse(ctx context.Context, params *ListExportJobsSyncJobsGetParams, reqEditors ...RequestEditorFn) (*ListExportJobsSyncJobsGetResponse, error)
+
+	// GetExportJobSyncJobsJobIdGetWithResponse request
+	GetExportJobSyncJobsJobIdGetWithResponse(ctx context.Context, jobId string, params *GetExportJobSyncJobsJobIdGetParams, reqEditors ...RequestEditorFn) (*GetExportJobSyncJobsJobIdGetResponse, error)
+
+	// CancelExportJobSyncJobsJobIdCancelPostWithResponse request
+	CancelExportJobSyncJobsJobIdCancelPostWithResponse(ctx context.Context, jobId string, params *CancelExportJobSyncJobsJobIdCancelPostParams, reqEditors ...RequestEditorFn) (*CancelExportJobSyncJobsJobIdCancelPostResponse, error)
+
+	// RetryExportJobSyncJobsJobIdRetryPostWithResponse request
+	RetryExportJobSyncJobsJobIdRetryPostWithResponse(ctx context.Context, jobId string, params *RetryExportJobSyncJobsJobIdRetryPostParams, reqEditors ...RequestEditorFn) (*RetryExportJobSyncJobsJobIdRetryPostResponse, error)
+
+	// ListExportJobTasksSyncJobsJobIdTasksGetWithResponse request
+	ListExportJobTasksSyncJobsJobIdTasksGetWithResponse(ctx context.Context, jobId string, params *ListExportJobTasksSyncJobsJobIdTasksGetParams, reqEditors ...RequestEditorFn) (*ListExportJobTasksSyncJobsJobIdTasksGetResponse, error)
 
 	// CreateWebflowDestinationSyncWebflowPostWithBodyWithResponse request with any body
 	CreateWebflowDestinationSyncWebflowPostWithBodyWithResponse(ctx context.Context, params *CreateWebflowDestinationSyncWebflowPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateWebflowDestinationSyncWebflowPostResponse, error)
@@ -17266,12 +14939,6 @@ type ClientWithResponsesInterface interface {
 
 	// ImportFromDestinationSyncDestinationIdImportPostWithBodyWithResponse request with any body
 	ImportFromDestinationSyncDestinationIdImportPostWithBodyWithResponse(ctx context.Context, destinationId string, params *ImportFromDestinationSyncDestinationIdImportPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ImportFromDestinationSyncDestinationIdImportPostResponse, error)
-
-	// ListSyncDestinationsByTenantSyncTenantIdGetWithResponse request
-	ListSyncDestinationsByTenantSyncTenantIdGetWithResponse(ctx context.Context, tenantId string, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByTenantSyncTenantIdGetResponse, error)
-
-	// ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetWithResponse request
-	ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetWithResponse(ctx context.Context, tenantId string, collectionId string, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse, error)
 
 	// CreateTenantTenantsPostWithBodyWithResponse request with any body
 	CreateTenantTenantsPostWithBodyWithResponse(ctx context.Context, params *CreateTenantTenantsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTenantTenantsPostResponse, error)
@@ -17573,6 +15240,29 @@ func (r GetMeAuthMeGetResponse) StatusCode() int {
 	return 0
 }
 
+type SetMyOnboardingStatusAuthMeOnboardingPatchResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *UserWithAuthorization
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r SetMyOnboardingStatusAuthMeOnboardingPatchResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SetMyOnboardingStatusAuthMeOnboardingPatchResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RefreshAccessTokenAuthRefreshPostResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -17682,6 +15372,98 @@ func (r ResetPasswordAuthResetPasswordPostResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ResetPasswordAuthResetPasswordPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListBackupsBackupsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]BackupResponse
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r ListBackupsBackupsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListBackupsBackupsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateBackupBackupsPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *BackupResponse
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateBackupBackupsPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateBackupBackupsPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteBackupBackupsBackupIdDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteBackupBackupsBackupIdDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteBackupBackupsBackupIdDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RestoreBackupBackupsBackupIdRestorePostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *BackupResponse
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r RestoreBackupBackupsBackupIdRestorePostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RestoreBackupBackupsBackupIdRestorePostResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -18870,6 +16652,29 @@ func (r CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostRespons
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *[]CustomCollectionItemResponseModel
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -20156,15 +17961,15 @@ func (r RemoveMemberOrgsOrgIdMembersUserIdDeleteResponse) StatusCode() int {
 	return 0
 }
 
-type ListArticlesPublicArticlesGetResponse struct {
+type ListSyncDestinationsByTenantSyncGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *PaginatedResponseArticleResponseModel
+	JSON200      *interface{}
 	JSON422      *HTTPValidationError
 }
 
 // Status returns HTTPResponse.Status
-func (r ListArticlesPublicArticlesGetResponse) Status() string {
+func (r ListSyncDestinationsByTenantSyncGetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -20172,22 +17977,22 @@ func (r ListArticlesPublicArticlesGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ListArticlesPublicArticlesGetResponse) StatusCode() int {
+func (r ListSyncDestinationsByTenantSyncGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetArticleBySlugPublicArticlesBySlugSlugGetResponse struct {
+type ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ArticleResponseModel
+	JSON200      *interface{}
 	JSON422      *HTTPValidationError
 }
 
 // Status returns HTTPResponse.Status
-func (r GetArticleBySlugPublicArticlesBySlugSlugGetResponse) Status() string {
+func (r ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -20195,651 +18000,7 @@ func (r GetArticleBySlugPublicArticlesBySlugSlugGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetArticleBySlugPublicArticlesBySlugSlugGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListArticlesPreviewPublicArticlesPreviewGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponseArticlePreviewResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListArticlesPreviewPublicArticlesPreviewGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListArticlesPreviewPublicArticlesPreviewGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetArticlePublicArticlesArticleIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ArticleResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetArticlePublicArticlesArticleIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetArticlePublicArticlesArticleIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetTranslationsPublicArticlesArticleIdTranslationsGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]ArticleResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetTranslationsPublicArticlesArticleIdTranslationsGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetTranslationsPublicArticlesArticleIdTranslationsGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetAvailableLanguagesPublicAvailableLanguagesGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]string
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetAvailableLanguagesPublicAvailableLanguagesGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetAvailableLanguagesPublicAvailableLanguagesGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListCategoriesPublicCategoriesGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponse
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListCategoriesPublicCategoriesGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListCategoriesPublicCategoriesGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CategoryResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetCategoryPublicCategoriesCategoryIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CategoryResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetCategoryPublicCategoriesCategoryIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetCategoryPublicCategoriesCategoryIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]string
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]CategoryResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]CategoryResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListCollectionsPublicCustomCollectionsGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponse
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListCollectionsPublicCustomCollectionsGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListCollectionsPublicCustomCollectionsGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CustomCollectionResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetCollectionPublicCustomCollectionsCollectionIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CustomCollectionResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetCollectionPublicCustomCollectionsCollectionIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetCollectionPublicCustomCollectionsCollectionIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponse
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CustomCollectionItemResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponseCustomCollectionItemPreviewResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *CustomCollectionItemResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListMicroCopiesPublicMicroCopyGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]MicroCopyResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListMicroCopiesPublicMicroCopyGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListMicroCopiesPublicMicroCopyGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *MicroCopyResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type CountMicroCopiesPublicMicroCopyCountGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *map[string]interface{}
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r CountMicroCopiesPublicMicroCopyCountGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CountMicroCopiesPublicMicroCopyCountGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]MicroCopyResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]MicroCopyResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *MicroCopyResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListPagesPublicPagesGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponsePageResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListPagesPublicPagesGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListPagesPublicPagesGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetPageBySlugPublicPagesBySlugSlugGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PageResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetPageBySlugPublicPagesBySlugSlugGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetPageBySlugPublicPagesBySlugSlugGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListPagesPreviewPublicPagesPreviewGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedResponsePagePreviewResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListPagesPreviewPublicPagesPreviewGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListPagesPreviewPublicPagesPreviewGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetPagePublicPagesPageIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PageResponseModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetPagePublicPagesPageIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetPagePublicPagesPageIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type SearchPublicSearchGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]SearchResultModel
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r SearchPublicSearchGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r SearchPublicSearchGetResponse) StatusCode() int {
+func (r ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -20863,6 +18024,121 @@ func (r CreateGripDestinationSyncGripPostResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateGripDestinationSyncGripPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListExportJobsSyncJobsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r ListExportJobsSyncJobsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListExportJobsSyncJobsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetExportJobSyncJobsJobIdGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetExportJobSyncJobsJobIdGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetExportJobSyncJobsJobIdGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CancelExportJobSyncJobsJobIdCancelPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r CancelExportJobSyncJobsJobIdCancelPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CancelExportJobSyncJobsJobIdCancelPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RetryExportJobSyncJobsJobIdRetryPostResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r RetryExportJobSyncJobsJobIdRetryPostResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RetryExportJobSyncJobsJobIdRetryPostResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListExportJobTasksSyncJobsJobIdTasksGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *interface{}
+	JSON422      *HTTPValidationError
+}
+
+// Status returns HTTPResponse.Status
+func (r ListExportJobTasksSyncJobsJobIdTasksGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListExportJobTasksSyncJobsJobIdTasksGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -20978,52 +18254,6 @@ func (r ImportFromDestinationSyncDestinationIdImportPostResponse) Status() strin
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ImportFromDestinationSyncDestinationIdImportPostResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListSyncDestinationsByTenantSyncTenantIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *interface{}
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListSyncDestinationsByTenantSyncTenantIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListSyncDestinationsByTenantSyncTenantIdGetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *interface{}
-	JSON422      *HTTPValidationError
-}
-
-// Status returns HTTPResponse.Status
-func (r ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -21338,6 +18568,23 @@ func (c *ClientWithResponses) GetMeAuthMeGetWithResponse(ctx context.Context, re
 	return ParseGetMeAuthMeGetResponse(rsp)
 }
 
+// SetMyOnboardingStatusAuthMeOnboardingPatchWithBodyWithResponse request with arbitrary body returning *SetMyOnboardingStatusAuthMeOnboardingPatchResponse
+func (c *ClientWithResponses) SetMyOnboardingStatusAuthMeOnboardingPatchWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetMyOnboardingStatusAuthMeOnboardingPatchResponse, error) {
+	rsp, err := c.SetMyOnboardingStatusAuthMeOnboardingPatchWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetMyOnboardingStatusAuthMeOnboardingPatchResponse(rsp)
+}
+
+func (c *ClientWithResponses) SetMyOnboardingStatusAuthMeOnboardingPatchWithResponse(ctx context.Context, body SetMyOnboardingStatusAuthMeOnboardingPatchJSONRequestBody, reqEditors ...RequestEditorFn) (*SetMyOnboardingStatusAuthMeOnboardingPatchResponse, error) {
+	rsp, err := c.SetMyOnboardingStatusAuthMeOnboardingPatch(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetMyOnboardingStatusAuthMeOnboardingPatchResponse(rsp)
+}
+
 // RefreshAccessTokenAuthRefreshPostWithBodyWithResponse request with arbitrary body returning *RefreshAccessTokenAuthRefreshPostResponse
 func (c *ClientWithResponses) RefreshAccessTokenAuthRefreshPostWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RefreshAccessTokenAuthRefreshPostResponse, error) {
 	rsp, err := c.RefreshAccessTokenAuthRefreshPostWithBody(ctx, contentType, body, reqEditors...)
@@ -21413,6 +18660,42 @@ func (c *ClientWithResponses) ResetPasswordAuthResetPasswordPostWithResponse(ctx
 		return nil, err
 	}
 	return ParseResetPasswordAuthResetPasswordPostResponse(rsp)
+}
+
+// ListBackupsBackupsGetWithResponse request returning *ListBackupsBackupsGetResponse
+func (c *ClientWithResponses) ListBackupsBackupsGetWithResponse(ctx context.Context, params *ListBackupsBackupsGetParams, reqEditors ...RequestEditorFn) (*ListBackupsBackupsGetResponse, error) {
+	rsp, err := c.ListBackupsBackupsGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListBackupsBackupsGetResponse(rsp)
+}
+
+// CreateBackupBackupsPostWithResponse request returning *CreateBackupBackupsPostResponse
+func (c *ClientWithResponses) CreateBackupBackupsPostWithResponse(ctx context.Context, params *CreateBackupBackupsPostParams, reqEditors ...RequestEditorFn) (*CreateBackupBackupsPostResponse, error) {
+	rsp, err := c.CreateBackupBackupsPost(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateBackupBackupsPostResponse(rsp)
+}
+
+// DeleteBackupBackupsBackupIdDeleteWithResponse request returning *DeleteBackupBackupsBackupIdDeleteResponse
+func (c *ClientWithResponses) DeleteBackupBackupsBackupIdDeleteWithResponse(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*DeleteBackupBackupsBackupIdDeleteResponse, error) {
+	rsp, err := c.DeleteBackupBackupsBackupIdDelete(ctx, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteBackupBackupsBackupIdDeleteResponse(rsp)
+}
+
+// RestoreBackupBackupsBackupIdRestorePostWithResponse request returning *RestoreBackupBackupsBackupIdRestorePostResponse
+func (c *ClientWithResponses) RestoreBackupBackupsBackupIdRestorePostWithResponse(ctx context.Context, backupId string, reqEditors ...RequestEditorFn) (*RestoreBackupBackupsBackupIdRestorePostResponse, error) {
+	rsp, err := c.RestoreBackupBackupsBackupIdRestorePost(ctx, backupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRestoreBackupBackupsBackupIdRestorePostResponse(rsp)
 }
 
 // CreateCheckoutSessionBillingCheckoutPostWithBodyWithResponse request with arbitrary body returning *CreateCheckoutSessionBillingCheckoutPostResponse
@@ -22041,6 +19324,23 @@ func (c *ClientWithResponses) CreateItemsBatchManageCustomCollectionsCollectionI
 		return nil, err
 	}
 	return ParseCreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostResponse(rsp)
+}
+
+// GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBodyWithResponse request with arbitrary body returning *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse
+func (c *ClientWithResponses) GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBodyWithResponse(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse, error) {
+	rsp, err := c.GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithBody(ctx, collectionId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse(rsp)
+}
+
+func (c *ClientWithResponses) GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithResponse(ctx context.Context, collectionId string, params *GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostParams, body GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostJSONRequestBody, reqEditors ...RequestEditorFn) (*GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse, error) {
+	rsp, err := c.GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPost(ctx, collectionId, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse(rsp)
 }
 
 // GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse request returning *GetItemBySlugManageCustomCollectionsCollectionIdItemsBySlugSlugGetResponse
@@ -22675,274 +19975,22 @@ func (c *ClientWithResponses) RemoveMemberOrgsOrgIdMembersUserIdDeleteWithRespon
 	return ParseRemoveMemberOrgsOrgIdMembersUserIdDeleteResponse(rsp)
 }
 
-// ListArticlesPublicArticlesGetWithResponse request returning *ListArticlesPublicArticlesGetResponse
-func (c *ClientWithResponses) ListArticlesPublicArticlesGetWithResponse(ctx context.Context, params *ListArticlesPublicArticlesGetParams, reqEditors ...RequestEditorFn) (*ListArticlesPublicArticlesGetResponse, error) {
-	rsp, err := c.ListArticlesPublicArticlesGet(ctx, params, reqEditors...)
+// ListSyncDestinationsByTenantSyncGetWithResponse request returning *ListSyncDestinationsByTenantSyncGetResponse
+func (c *ClientWithResponses) ListSyncDestinationsByTenantSyncGetWithResponse(ctx context.Context, params *ListSyncDestinationsByTenantSyncGetParams, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByTenantSyncGetResponse, error) {
+	rsp, err := c.ListSyncDestinationsByTenantSyncGet(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseListArticlesPublicArticlesGetResponse(rsp)
+	return ParseListSyncDestinationsByTenantSyncGetResponse(rsp)
 }
 
-// GetArticleBySlugPublicArticlesBySlugSlugGetWithResponse request returning *GetArticleBySlugPublicArticlesBySlugSlugGetResponse
-func (c *ClientWithResponses) GetArticleBySlugPublicArticlesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetArticleBySlugPublicArticlesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetArticleBySlugPublicArticlesBySlugSlugGetResponse, error) {
-	rsp, err := c.GetArticleBySlugPublicArticlesBySlugSlugGet(ctx, slug, params, reqEditors...)
+// ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetWithResponse request returning *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse
+func (c *ClientWithResponses) ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetWithResponse(ctx context.Context, collectionId string, params *ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetParams, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse, error) {
+	rsp, err := c.ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGet(ctx, collectionId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetArticleBySlugPublicArticlesBySlugSlugGetResponse(rsp)
-}
-
-// ListArticlesPreviewPublicArticlesPreviewGetWithResponse request returning *ListArticlesPreviewPublicArticlesPreviewGetResponse
-func (c *ClientWithResponses) ListArticlesPreviewPublicArticlesPreviewGetWithResponse(ctx context.Context, params *ListArticlesPreviewPublicArticlesPreviewGetParams, reqEditors ...RequestEditorFn) (*ListArticlesPreviewPublicArticlesPreviewGetResponse, error) {
-	rsp, err := c.ListArticlesPreviewPublicArticlesPreviewGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListArticlesPreviewPublicArticlesPreviewGetResponse(rsp)
-}
-
-// GetArticlePublicArticlesArticleIdGetWithResponse request returning *GetArticlePublicArticlesArticleIdGetResponse
-func (c *ClientWithResponses) GetArticlePublicArticlesArticleIdGetWithResponse(ctx context.Context, articleId string, params *GetArticlePublicArticlesArticleIdGetParams, reqEditors ...RequestEditorFn) (*GetArticlePublicArticlesArticleIdGetResponse, error) {
-	rsp, err := c.GetArticlePublicArticlesArticleIdGet(ctx, articleId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetArticlePublicArticlesArticleIdGetResponse(rsp)
-}
-
-// GetTranslationsPublicArticlesArticleIdTranslationsGetWithResponse request returning *GetTranslationsPublicArticlesArticleIdTranslationsGetResponse
-func (c *ClientWithResponses) GetTranslationsPublicArticlesArticleIdTranslationsGetWithResponse(ctx context.Context, articleId string, params *GetTranslationsPublicArticlesArticleIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*GetTranslationsPublicArticlesArticleIdTranslationsGetResponse, error) {
-	rsp, err := c.GetTranslationsPublicArticlesArticleIdTranslationsGet(ctx, articleId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetTranslationsPublicArticlesArticleIdTranslationsGetResponse(rsp)
-}
-
-// GetAvailableLanguagesPublicAvailableLanguagesGetWithResponse request returning *GetAvailableLanguagesPublicAvailableLanguagesGetResponse
-func (c *ClientWithResponses) GetAvailableLanguagesPublicAvailableLanguagesGetWithResponse(ctx context.Context, params *GetAvailableLanguagesPublicAvailableLanguagesGetParams, reqEditors ...RequestEditorFn) (*GetAvailableLanguagesPublicAvailableLanguagesGetResponse, error) {
-	rsp, err := c.GetAvailableLanguagesPublicAvailableLanguagesGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetAvailableLanguagesPublicAvailableLanguagesGetResponse(rsp)
-}
-
-// ListCategoriesPublicCategoriesGetWithResponse request returning *ListCategoriesPublicCategoriesGetResponse
-func (c *ClientWithResponses) ListCategoriesPublicCategoriesGetWithResponse(ctx context.Context, params *ListCategoriesPublicCategoriesGetParams, reqEditors ...RequestEditorFn) (*ListCategoriesPublicCategoriesGetResponse, error) {
-	rsp, err := c.ListCategoriesPublicCategoriesGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListCategoriesPublicCategoriesGetResponse(rsp)
-}
-
-// GetCategoryBySlugPublicCategoriesBySlugSlugGetWithResponse request returning *GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse
-func (c *ClientWithResponses) GetCategoryBySlugPublicCategoriesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetCategoryBySlugPublicCategoriesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse, error) {
-	rsp, err := c.GetCategoryBySlugPublicCategoriesBySlugSlugGet(ctx, slug, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetCategoryBySlugPublicCategoriesBySlugSlugGetResponse(rsp)
-}
-
-// GetCategoryPublicCategoriesCategoryIdGetWithResponse request returning *GetCategoryPublicCategoriesCategoryIdGetResponse
-func (c *ClientWithResponses) GetCategoryPublicCategoriesCategoryIdGetWithResponse(ctx context.Context, categoryId string, params *GetCategoryPublicCategoriesCategoryIdGetParams, reqEditors ...RequestEditorFn) (*GetCategoryPublicCategoriesCategoryIdGetResponse, error) {
-	rsp, err := c.GetCategoryPublicCategoriesCategoryIdGet(ctx, categoryId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetCategoryPublicCategoriesCategoryIdGetResponse(rsp)
-}
-
-// GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetWithResponse request returning *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse
-func (c *ClientWithResponses) GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetWithResponse(ctx context.Context, categoryId string, params *GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetParams, reqEditors ...RequestEditorFn) (*GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse, error) {
-	rsp, err := c.GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGet(ctx, categoryId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse(rsp)
-}
-
-// GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetWithResponse request returning *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse
-func (c *ClientWithResponses) GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetWithResponse(ctx context.Context, categoryId string, params *GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetParams, reqEditors ...RequestEditorFn) (*GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse, error) {
-	rsp, err := c.GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGet(ctx, categoryId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse(rsp)
-}
-
-// GetTranslationsPublicCategoriesCategoryIdTranslationsGetWithResponse request returning *GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse
-func (c *ClientWithResponses) GetTranslationsPublicCategoriesCategoryIdTranslationsGetWithResponse(ctx context.Context, categoryId string, params *GetTranslationsPublicCategoriesCategoryIdTranslationsGetParams, reqEditors ...RequestEditorFn) (*GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse, error) {
-	rsp, err := c.GetTranslationsPublicCategoriesCategoryIdTranslationsGet(ctx, categoryId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse(rsp)
-}
-
-// ListCollectionsPublicCustomCollectionsGetWithResponse request returning *ListCollectionsPublicCustomCollectionsGetResponse
-func (c *ClientWithResponses) ListCollectionsPublicCustomCollectionsGetWithResponse(ctx context.Context, params *ListCollectionsPublicCustomCollectionsGetParams, reqEditors ...RequestEditorFn) (*ListCollectionsPublicCustomCollectionsGetResponse, error) {
-	rsp, err := c.ListCollectionsPublicCustomCollectionsGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListCollectionsPublicCustomCollectionsGetResponse(rsp)
-}
-
-// GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetWithResponse request returning *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse
-func (c *ClientWithResponses) GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse, error) {
-	rsp, err := c.GetCollectionBySlugPublicCustomCollectionsBySlugSlugGet(ctx, slug, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse(rsp)
-}
-
-// GetCollectionPublicCustomCollectionsCollectionIdGetWithResponse request returning *GetCollectionPublicCustomCollectionsCollectionIdGetResponse
-func (c *ClientWithResponses) GetCollectionPublicCustomCollectionsCollectionIdGetWithResponse(ctx context.Context, collectionId string, params *GetCollectionPublicCustomCollectionsCollectionIdGetParams, reqEditors ...RequestEditorFn) (*GetCollectionPublicCustomCollectionsCollectionIdGetResponse, error) {
-	rsp, err := c.GetCollectionPublicCustomCollectionsCollectionIdGet(ctx, collectionId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetCollectionPublicCustomCollectionsCollectionIdGetResponse(rsp)
-}
-
-// ListItemsPublicCustomCollectionsCollectionIdItemsGetWithResponse request returning *ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse
-func (c *ClientWithResponses) ListItemsPublicCustomCollectionsCollectionIdItemsGetWithResponse(ctx context.Context, collectionId string, params *ListItemsPublicCustomCollectionsCollectionIdItemsGetParams, reqEditors ...RequestEditorFn) (*ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse, error) {
-	rsp, err := c.ListItemsPublicCustomCollectionsCollectionIdItemsGet(ctx, collectionId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListItemsPublicCustomCollectionsCollectionIdItemsGetResponse(rsp)
-}
-
-// GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse request returning *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse
-func (c *ClientWithResponses) GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse(ctx context.Context, collectionId string, slug string, params *GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse, error) {
-	rsp, err := c.GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGet(ctx, collectionId, slug, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse(rsp)
-}
-
-// ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetWithResponse request returning *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse
-func (c *ClientWithResponses) ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetWithResponse(ctx context.Context, collectionId string, params *ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetParams, reqEditors ...RequestEditorFn) (*ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse, error) {
-	rsp, err := c.ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGet(ctx, collectionId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse(rsp)
-}
-
-// GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetWithResponse request returning *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse
-func (c *ClientWithResponses) GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetWithResponse(ctx context.Context, collectionId string, itemId string, params *GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetParams, reqEditors ...RequestEditorFn) (*GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse, error) {
-	rsp, err := c.GetItemPublicCustomCollectionsCollectionIdItemsItemIdGet(ctx, collectionId, itemId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse(rsp)
-}
-
-// ListMicroCopiesPublicMicroCopyGetWithResponse request returning *ListMicroCopiesPublicMicroCopyGetResponse
-func (c *ClientWithResponses) ListMicroCopiesPublicMicroCopyGetWithResponse(ctx context.Context, params *ListMicroCopiesPublicMicroCopyGetParams, reqEditors ...RequestEditorFn) (*ListMicroCopiesPublicMicroCopyGetResponse, error) {
-	rsp, err := c.ListMicroCopiesPublicMicroCopyGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListMicroCopiesPublicMicroCopyGetResponse(rsp)
-}
-
-// GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetWithResponse request returning *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse
-func (c *ClientWithResponses) GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetWithResponse(ctx context.Context, key string, params *GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse, error) {
-	rsp, err := c.GetMicroCopyByKeyPublicMicroCopyByKeyKeyGet(ctx, key, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse(rsp)
-}
-
-// CountMicroCopiesPublicMicroCopyCountGetWithResponse request returning *CountMicroCopiesPublicMicroCopyCountGetResponse
-func (c *ClientWithResponses) CountMicroCopiesPublicMicroCopyCountGetWithResponse(ctx context.Context, params *CountMicroCopiesPublicMicroCopyCountGetParams, reqEditors ...RequestEditorFn) (*CountMicroCopiesPublicMicroCopyCountGetResponse, error) {
-	rsp, err := c.CountMicroCopiesPublicMicroCopyCountGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCountMicroCopiesPublicMicroCopyCountGetResponse(rsp)
-}
-
-// GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetWithResponse request returning *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse
-func (c *ClientWithResponses) GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetWithResponse(ctx context.Context, language string, params *GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse, error) {
-	rsp, err := c.GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGet(ctx, language, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse(rsp)
-}
-
-// GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetWithResponse request returning *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse
-func (c *ClientWithResponses) GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetWithResponse(ctx context.Context, translationOf string, params *GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse, error) {
-	rsp, err := c.GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGet(ctx, translationOf, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse(rsp)
-}
-
-// GetMicroCopyPublicMicroCopyMicroCopyIdGetWithResponse request returning *GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse
-func (c *ClientWithResponses) GetMicroCopyPublicMicroCopyMicroCopyIdGetWithResponse(ctx context.Context, microCopyId string, params *GetMicroCopyPublicMicroCopyMicroCopyIdGetParams, reqEditors ...RequestEditorFn) (*GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse, error) {
-	rsp, err := c.GetMicroCopyPublicMicroCopyMicroCopyIdGet(ctx, microCopyId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetMicroCopyPublicMicroCopyMicroCopyIdGetResponse(rsp)
-}
-
-// ListPagesPublicPagesGetWithResponse request returning *ListPagesPublicPagesGetResponse
-func (c *ClientWithResponses) ListPagesPublicPagesGetWithResponse(ctx context.Context, params *ListPagesPublicPagesGetParams, reqEditors ...RequestEditorFn) (*ListPagesPublicPagesGetResponse, error) {
-	rsp, err := c.ListPagesPublicPagesGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListPagesPublicPagesGetResponse(rsp)
-}
-
-// GetPageBySlugPublicPagesBySlugSlugGetWithResponse request returning *GetPageBySlugPublicPagesBySlugSlugGetResponse
-func (c *ClientWithResponses) GetPageBySlugPublicPagesBySlugSlugGetWithResponse(ctx context.Context, slug string, params *GetPageBySlugPublicPagesBySlugSlugGetParams, reqEditors ...RequestEditorFn) (*GetPageBySlugPublicPagesBySlugSlugGetResponse, error) {
-	rsp, err := c.GetPageBySlugPublicPagesBySlugSlugGet(ctx, slug, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetPageBySlugPublicPagesBySlugSlugGetResponse(rsp)
-}
-
-// ListPagesPreviewPublicPagesPreviewGetWithResponse request returning *ListPagesPreviewPublicPagesPreviewGetResponse
-func (c *ClientWithResponses) ListPagesPreviewPublicPagesPreviewGetWithResponse(ctx context.Context, params *ListPagesPreviewPublicPagesPreviewGetParams, reqEditors ...RequestEditorFn) (*ListPagesPreviewPublicPagesPreviewGetResponse, error) {
-	rsp, err := c.ListPagesPreviewPublicPagesPreviewGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListPagesPreviewPublicPagesPreviewGetResponse(rsp)
-}
-
-// GetPagePublicPagesPageIdGetWithResponse request returning *GetPagePublicPagesPageIdGetResponse
-func (c *ClientWithResponses) GetPagePublicPagesPageIdGetWithResponse(ctx context.Context, pageId string, params *GetPagePublicPagesPageIdGetParams, reqEditors ...RequestEditorFn) (*GetPagePublicPagesPageIdGetResponse, error) {
-	rsp, err := c.GetPagePublicPagesPageIdGet(ctx, pageId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetPagePublicPagesPageIdGetResponse(rsp)
-}
-
-// SearchPublicSearchGetWithResponse request returning *SearchPublicSearchGetResponse
-func (c *ClientWithResponses) SearchPublicSearchGetWithResponse(ctx context.Context, params *SearchPublicSearchGetParams, reqEditors ...RequestEditorFn) (*SearchPublicSearchGetResponse, error) {
-	rsp, err := c.SearchPublicSearchGet(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseSearchPublicSearchGetResponse(rsp)
+	return ParseListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse(rsp)
 }
 
 // CreateGripDestinationSyncGripPostWithBodyWithResponse request with arbitrary body returning *CreateGripDestinationSyncGripPostResponse
@@ -22960,6 +20008,51 @@ func (c *ClientWithResponses) CreateGripDestinationSyncGripPostWithResponse(ctx 
 		return nil, err
 	}
 	return ParseCreateGripDestinationSyncGripPostResponse(rsp)
+}
+
+// ListExportJobsSyncJobsGetWithResponse request returning *ListExportJobsSyncJobsGetResponse
+func (c *ClientWithResponses) ListExportJobsSyncJobsGetWithResponse(ctx context.Context, params *ListExportJobsSyncJobsGetParams, reqEditors ...RequestEditorFn) (*ListExportJobsSyncJobsGetResponse, error) {
+	rsp, err := c.ListExportJobsSyncJobsGet(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListExportJobsSyncJobsGetResponse(rsp)
+}
+
+// GetExportJobSyncJobsJobIdGetWithResponse request returning *GetExportJobSyncJobsJobIdGetResponse
+func (c *ClientWithResponses) GetExportJobSyncJobsJobIdGetWithResponse(ctx context.Context, jobId string, params *GetExportJobSyncJobsJobIdGetParams, reqEditors ...RequestEditorFn) (*GetExportJobSyncJobsJobIdGetResponse, error) {
+	rsp, err := c.GetExportJobSyncJobsJobIdGet(ctx, jobId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetExportJobSyncJobsJobIdGetResponse(rsp)
+}
+
+// CancelExportJobSyncJobsJobIdCancelPostWithResponse request returning *CancelExportJobSyncJobsJobIdCancelPostResponse
+func (c *ClientWithResponses) CancelExportJobSyncJobsJobIdCancelPostWithResponse(ctx context.Context, jobId string, params *CancelExportJobSyncJobsJobIdCancelPostParams, reqEditors ...RequestEditorFn) (*CancelExportJobSyncJobsJobIdCancelPostResponse, error) {
+	rsp, err := c.CancelExportJobSyncJobsJobIdCancelPost(ctx, jobId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCancelExportJobSyncJobsJobIdCancelPostResponse(rsp)
+}
+
+// RetryExportJobSyncJobsJobIdRetryPostWithResponse request returning *RetryExportJobSyncJobsJobIdRetryPostResponse
+func (c *ClientWithResponses) RetryExportJobSyncJobsJobIdRetryPostWithResponse(ctx context.Context, jobId string, params *RetryExportJobSyncJobsJobIdRetryPostParams, reqEditors ...RequestEditorFn) (*RetryExportJobSyncJobsJobIdRetryPostResponse, error) {
+	rsp, err := c.RetryExportJobSyncJobsJobIdRetryPost(ctx, jobId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRetryExportJobSyncJobsJobIdRetryPostResponse(rsp)
+}
+
+// ListExportJobTasksSyncJobsJobIdTasksGetWithResponse request returning *ListExportJobTasksSyncJobsJobIdTasksGetResponse
+func (c *ClientWithResponses) ListExportJobTasksSyncJobsJobIdTasksGetWithResponse(ctx context.Context, jobId string, params *ListExportJobTasksSyncJobsJobIdTasksGetParams, reqEditors ...RequestEditorFn) (*ListExportJobTasksSyncJobsJobIdTasksGetResponse, error) {
+	rsp, err := c.ListExportJobTasksSyncJobsJobIdTasksGet(ctx, jobId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListExportJobTasksSyncJobsJobIdTasksGetResponse(rsp)
 }
 
 // CreateWebflowDestinationSyncWebflowPostWithBodyWithResponse request with arbitrary body returning *CreateWebflowDestinationSyncWebflowPostResponse
@@ -23021,24 +20114,6 @@ func (c *ClientWithResponses) ImportFromDestinationSyncDestinationIdImportPostWi
 		return nil, err
 	}
 	return ParseImportFromDestinationSyncDestinationIdImportPostResponse(rsp)
-}
-
-// ListSyncDestinationsByTenantSyncTenantIdGetWithResponse request returning *ListSyncDestinationsByTenantSyncTenantIdGetResponse
-func (c *ClientWithResponses) ListSyncDestinationsByTenantSyncTenantIdGetWithResponse(ctx context.Context, tenantId string, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByTenantSyncTenantIdGetResponse, error) {
-	rsp, err := c.ListSyncDestinationsByTenantSyncTenantIdGet(ctx, tenantId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListSyncDestinationsByTenantSyncTenantIdGetResponse(rsp)
-}
-
-// ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetWithResponse request returning *ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse
-func (c *ClientWithResponses) ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetWithResponse(ctx context.Context, tenantId string, collectionId string, reqEditors ...RequestEditorFn) (*ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse, error) {
-	rsp, err := c.ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGet(ctx, tenantId, collectionId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse(rsp)
 }
 
 // CreateTenantTenantsPostWithBodyWithResponse request with arbitrary body returning *CreateTenantTenantsPostResponse
@@ -23502,6 +20577,39 @@ func ParseGetMeAuthMeGetResponse(rsp *http.Response) (*GetMeAuthMeGetResponse, e
 	return response, nil
 }
 
+// ParseSetMyOnboardingStatusAuthMeOnboardingPatchResponse parses an HTTP response from a SetMyOnboardingStatusAuthMeOnboardingPatchWithResponse call
+func ParseSetMyOnboardingStatusAuthMeOnboardingPatchResponse(rsp *http.Response) (*SetMyOnboardingStatusAuthMeOnboardingPatchResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SetMyOnboardingStatusAuthMeOnboardingPatchResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UserWithAuthorization
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRefreshAccessTokenAuthRefreshPostResponse parses an HTTP response from a RefreshAccessTokenAuthRefreshPostWithResponse call
 func ParseRefreshAccessTokenAuthRefreshPostResponse(rsp *http.Response) (*RefreshAccessTokenAuthRefreshPostResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -23650,6 +20758,138 @@ func ParseResetPasswordAuthResetPasswordPostResponse(rsp *http.Response) (*Reset
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListBackupsBackupsGetResponse parses an HTTP response from a ListBackupsBackupsGetWithResponse call
+func ParseListBackupsBackupsGetResponse(rsp *http.Response) (*ListBackupsBackupsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListBackupsBackupsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []BackupResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateBackupBackupsPostResponse parses an HTTP response from a CreateBackupBackupsPostWithResponse call
+func ParseCreateBackupBackupsPostResponse(rsp *http.Response) (*CreateBackupBackupsPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateBackupBackupsPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest BackupResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteBackupBackupsBackupIdDeleteResponse parses an HTTP response from a DeleteBackupBackupsBackupIdDeleteWithResponse call
+func ParseDeleteBackupBackupsBackupIdDeleteResponse(rsp *http.Response) (*DeleteBackupBackupsBackupIdDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteBackupBackupsBackupIdDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRestoreBackupBackupsBackupIdRestorePostResponse parses an HTTP response from a RestoreBackupBackupsBackupIdRestorePostWithResponse call
+func ParseRestoreBackupBackupsBackupIdRestorePostResponse(rsp *http.Response) (*RestoreBackupBackupsBackupIdRestorePostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RestoreBackupBackupsBackupIdRestorePostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest BackupResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -25314,6 +22554,39 @@ func ParseCreateItemsBatchManageCustomCollectionsCollectionIdItemsBatchPostRespo
 			return nil, err
 		}
 		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse parses an HTTP response from a GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostWithResponse call
+func ParseGetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse(rsp *http.Response) (*GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetItemsByIdsManageCustomCollectionsCollectionIdItemsByIdsPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest []CustomCollectionItemResponseModel
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
 		var dest HTTPValidationError
@@ -27119,22 +24392,22 @@ func ParseRemoveMemberOrgsOrgIdMembersUserIdDeleteResponse(rsp *http.Response) (
 	return response, nil
 }
 
-// ParseListArticlesPublicArticlesGetResponse parses an HTTP response from a ListArticlesPublicArticlesGetWithResponse call
-func ParseListArticlesPublicArticlesGetResponse(rsp *http.Response) (*ListArticlesPublicArticlesGetResponse, error) {
+// ParseListSyncDestinationsByTenantSyncGetResponse parses an HTTP response from a ListSyncDestinationsByTenantSyncGetWithResponse call
+func ParseListSyncDestinationsByTenantSyncGetResponse(rsp *http.Response) (*ListSyncDestinationsByTenantSyncGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ListArticlesPublicArticlesGetResponse{
+	response := &ListSyncDestinationsByTenantSyncGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponseArticleResponseModel
+		var dest interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -27152,946 +24425,22 @@ func ParseListArticlesPublicArticlesGetResponse(rsp *http.Response) (*ListArticl
 	return response, nil
 }
 
-// ParseGetArticleBySlugPublicArticlesBySlugSlugGetResponse parses an HTTP response from a GetArticleBySlugPublicArticlesBySlugSlugGetWithResponse call
-func ParseGetArticleBySlugPublicArticlesBySlugSlugGetResponse(rsp *http.Response) (*GetArticleBySlugPublicArticlesBySlugSlugGetResponse, error) {
+// ParseListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse parses an HTTP response from a ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetWithResponse call
+func ParseListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse(rsp *http.Response) (*ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetArticleBySlugPublicArticlesBySlugSlugGetResponse{
+	response := &ListSyncDestinationsByCollectionSyncByCollectionCollectionIdGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ArticleResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListArticlesPreviewPublicArticlesPreviewGetResponse parses an HTTP response from a ListArticlesPreviewPublicArticlesPreviewGetWithResponse call
-func ParseListArticlesPreviewPublicArticlesPreviewGetResponse(rsp *http.Response) (*ListArticlesPreviewPublicArticlesPreviewGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListArticlesPreviewPublicArticlesPreviewGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponseArticlePreviewResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetArticlePublicArticlesArticleIdGetResponse parses an HTTP response from a GetArticlePublicArticlesArticleIdGetWithResponse call
-func ParseGetArticlePublicArticlesArticleIdGetResponse(rsp *http.Response) (*GetArticlePublicArticlesArticleIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetArticlePublicArticlesArticleIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ArticleResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetTranslationsPublicArticlesArticleIdTranslationsGetResponse parses an HTTP response from a GetTranslationsPublicArticlesArticleIdTranslationsGetWithResponse call
-func ParseGetTranslationsPublicArticlesArticleIdTranslationsGetResponse(rsp *http.Response) (*GetTranslationsPublicArticlesArticleIdTranslationsGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetTranslationsPublicArticlesArticleIdTranslationsGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []ArticleResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetAvailableLanguagesPublicAvailableLanguagesGetResponse parses an HTTP response from a GetAvailableLanguagesPublicAvailableLanguagesGetWithResponse call
-func ParseGetAvailableLanguagesPublicAvailableLanguagesGetResponse(rsp *http.Response) (*GetAvailableLanguagesPublicAvailableLanguagesGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetAvailableLanguagesPublicAvailableLanguagesGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []string
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListCategoriesPublicCategoriesGetResponse parses an HTTP response from a ListCategoriesPublicCategoriesGetWithResponse call
-func ParseListCategoriesPublicCategoriesGetResponse(rsp *http.Response) (*ListCategoriesPublicCategoriesGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListCategoriesPublicCategoriesGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetCategoryBySlugPublicCategoriesBySlugSlugGetResponse parses an HTTP response from a GetCategoryBySlugPublicCategoriesBySlugSlugGetWithResponse call
-func ParseGetCategoryBySlugPublicCategoriesBySlugSlugGetResponse(rsp *http.Response) (*GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetCategoryBySlugPublicCategoriesBySlugSlugGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CategoryResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetCategoryPublicCategoriesCategoryIdGetResponse parses an HTTP response from a GetCategoryPublicCategoriesCategoryIdGetWithResponse call
-func ParseGetCategoryPublicCategoriesCategoryIdGetResponse(rsp *http.Response) (*GetCategoryPublicCategoriesCategoryIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetCategoryPublicCategoriesCategoryIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CategoryResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse parses an HTTP response from a GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetWithResponse call
-func ParseGetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse(rsp *http.Response) (*GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetArticlesForCategoryPublicCategoriesCategoryIdArticlesGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []string
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse parses an HTTP response from a GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetWithResponse call
-func ParseGetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse(rsp *http.Response) (*GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetSubcategoriesPublicCategoriesCategoryIdSubcategoriesGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []CategoryResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse parses an HTTP response from a GetTranslationsPublicCategoriesCategoryIdTranslationsGetWithResponse call
-func ParseGetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse(rsp *http.Response) (*GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetTranslationsPublicCategoriesCategoryIdTranslationsGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []CategoryResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListCollectionsPublicCustomCollectionsGetResponse parses an HTTP response from a ListCollectionsPublicCustomCollectionsGetWithResponse call
-func ParseListCollectionsPublicCustomCollectionsGetResponse(rsp *http.Response) (*ListCollectionsPublicCustomCollectionsGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListCollectionsPublicCustomCollectionsGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse parses an HTTP response from a GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetWithResponse call
-func ParseGetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse(rsp *http.Response) (*GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetCollectionBySlugPublicCustomCollectionsBySlugSlugGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CustomCollectionResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetCollectionPublicCustomCollectionsCollectionIdGetResponse parses an HTTP response from a GetCollectionPublicCustomCollectionsCollectionIdGetWithResponse call
-func ParseGetCollectionPublicCustomCollectionsCollectionIdGetResponse(rsp *http.Response) (*GetCollectionPublicCustomCollectionsCollectionIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetCollectionPublicCustomCollectionsCollectionIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CustomCollectionResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListItemsPublicCustomCollectionsCollectionIdItemsGetResponse parses an HTTP response from a ListItemsPublicCustomCollectionsCollectionIdItemsGetWithResponse call
-func ParseListItemsPublicCustomCollectionsCollectionIdItemsGetResponse(rsp *http.Response) (*ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListItemsPublicCustomCollectionsCollectionIdItemsGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponse
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse parses an HTTP response from a GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetWithResponse call
-func ParseGetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse(rsp *http.Response) (*GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetItemBySlugPublicCustomCollectionsCollectionIdItemsBySlugSlugGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CustomCollectionItemResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse parses an HTTP response from a ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetWithResponse call
-func ParseListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse(rsp *http.Response) (*ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListItemsPreviewPublicCustomCollectionsCollectionIdItemsPreviewGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponseCustomCollectionItemPreviewResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse parses an HTTP response from a GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetWithResponse call
-func ParseGetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse(rsp *http.Response) (*GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetItemPublicCustomCollectionsCollectionIdItemsItemIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CustomCollectionItemResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListMicroCopiesPublicMicroCopyGetResponse parses an HTTP response from a ListMicroCopiesPublicMicroCopyGetWithResponse call
-func ParseListMicroCopiesPublicMicroCopyGetResponse(rsp *http.Response) (*ListMicroCopiesPublicMicroCopyGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListMicroCopiesPublicMicroCopyGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []MicroCopyResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse parses an HTTP response from a GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetWithResponse call
-func ParseGetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse(rsp *http.Response) (*GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetMicroCopyByKeyPublicMicroCopyByKeyKeyGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest MicroCopyResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCountMicroCopiesPublicMicroCopyCountGetResponse parses an HTTP response from a CountMicroCopiesPublicMicroCopyCountGetWithResponse call
-func ParseCountMicroCopiesPublicMicroCopyCountGetResponse(rsp *http.Response) (*CountMicroCopiesPublicMicroCopyCountGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CountMicroCopiesPublicMicroCopyCountGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest map[string]interface{}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse parses an HTTP response from a GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetWithResponse call
-func ParseGetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse(rsp *http.Response) (*GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetMicroCopiesByLanguagePublicMicroCopyLanguageLanguageGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []MicroCopyResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse parses an HTTP response from a GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetWithResponse call
-func ParseGetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse(rsp *http.Response) (*GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetMicroCopyTranslationsPublicMicroCopyTranslationsTranslationOfGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []MicroCopyResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetMicroCopyPublicMicroCopyMicroCopyIdGetResponse parses an HTTP response from a GetMicroCopyPublicMicroCopyMicroCopyIdGetWithResponse call
-func ParseGetMicroCopyPublicMicroCopyMicroCopyIdGetResponse(rsp *http.Response) (*GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetMicroCopyPublicMicroCopyMicroCopyIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest MicroCopyResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListPagesPublicPagesGetResponse parses an HTTP response from a ListPagesPublicPagesGetWithResponse call
-func ParseListPagesPublicPagesGetResponse(rsp *http.Response) (*ListPagesPublicPagesGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListPagesPublicPagesGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponsePageResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetPageBySlugPublicPagesBySlugSlugGetResponse parses an HTTP response from a GetPageBySlugPublicPagesBySlugSlugGetWithResponse call
-func ParseGetPageBySlugPublicPagesBySlugSlugGetResponse(rsp *http.Response) (*GetPageBySlugPublicPagesBySlugSlugGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetPageBySlugPublicPagesBySlugSlugGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PageResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListPagesPreviewPublicPagesPreviewGetResponse parses an HTTP response from a ListPagesPreviewPublicPagesPreviewGetWithResponse call
-func ParseListPagesPreviewPublicPagesPreviewGetResponse(rsp *http.Response) (*ListPagesPreviewPublicPagesPreviewGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListPagesPreviewPublicPagesPreviewGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedResponsePagePreviewResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetPagePublicPagesPageIdGetResponse parses an HTTP response from a GetPagePublicPagesPageIdGetWithResponse call
-func ParseGetPagePublicPagesPageIdGetResponse(rsp *http.Response) (*GetPagePublicPagesPageIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetPagePublicPagesPageIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PageResponseModel
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseSearchPublicSearchGetResponse parses an HTTP response from a SearchPublicSearchGetWithResponse call
-func ParseSearchPublicSearchGetResponse(rsp *http.Response) (*SearchPublicSearchGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &SearchPublicSearchGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []SearchResultModel
+		var dest interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -28118,6 +24467,171 @@ func ParseCreateGripDestinationSyncGripPostResponse(rsp *http.Response) (*Create
 	}
 
 	response := &CreateGripDestinationSyncGripPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListExportJobsSyncJobsGetResponse parses an HTTP response from a ListExportJobsSyncJobsGetWithResponse call
+func ParseListExportJobsSyncJobsGetResponse(rsp *http.Response) (*ListExportJobsSyncJobsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListExportJobsSyncJobsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetExportJobSyncJobsJobIdGetResponse parses an HTTP response from a GetExportJobSyncJobsJobIdGetWithResponse call
+func ParseGetExportJobSyncJobsJobIdGetResponse(rsp *http.Response) (*GetExportJobSyncJobsJobIdGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetExportJobSyncJobsJobIdGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCancelExportJobSyncJobsJobIdCancelPostResponse parses an HTTP response from a CancelExportJobSyncJobsJobIdCancelPostWithResponse call
+func ParseCancelExportJobSyncJobsJobIdCancelPostResponse(rsp *http.Response) (*CancelExportJobSyncJobsJobIdCancelPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CancelExportJobSyncJobsJobIdCancelPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRetryExportJobSyncJobsJobIdRetryPostResponse parses an HTTP response from a RetryExportJobSyncJobsJobIdRetryPostWithResponse call
+func ParseRetryExportJobSyncJobsJobIdRetryPostResponse(rsp *http.Response) (*RetryExportJobSyncJobsJobIdRetryPostResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RetryExportJobSyncJobsJobIdRetryPostResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest HTTPValidationError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON422 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListExportJobTasksSyncJobsJobIdTasksGetResponse parses an HTTP response from a ListExportJobTasksSyncJobsJobIdTasksGetWithResponse call
+func ParseListExportJobTasksSyncJobsJobIdTasksGetResponse(rsp *http.Response) (*ListExportJobTasksSyncJobsJobIdTasksGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListExportJobTasksSyncJobsJobIdTasksGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -28283,72 +24797,6 @@ func ParseImportFromDestinationSyncDestinationIdImportPostResponse(rsp *http.Res
 	}
 
 	response := &ImportFromDestinationSyncDestinationIdImportPostResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListSyncDestinationsByTenantSyncTenantIdGetResponse parses an HTTP response from a ListSyncDestinationsByTenantSyncTenantIdGetWithResponse call
-func ParseListSyncDestinationsByTenantSyncTenantIdGetResponse(rsp *http.Response) (*ListSyncDestinationsByTenantSyncTenantIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListSyncDestinationsByTenantSyncTenantIdGetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest interface{}
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
-		var dest HTTPValidationError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON422 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse parses an HTTP response from a ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetWithResponse call
-func ParseListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse(rsp *http.Response) (*ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListSyncDestinationsByCollectionSyncTenantIdCollectionIdGetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

@@ -18,8 +18,9 @@ func init() {
 }
 
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the CLI version",
+	Use:     "version",
+	Short:   "Print the CLI version",
+	Example: "adapto version",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("adapto " + cliVersion)
 	},

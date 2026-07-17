@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/adaptocms/adapto-cms-cli/cmd/apikey"
 	"github.com/adaptocms/adapto-cms-cli/cmd/articles"
 	"github.com/adaptocms/adapto-cms-cli/cmd/auth"
 	"github.com/adaptocms/adapto-cms-cli/cmd/categories"
@@ -12,7 +13,10 @@ import (
 	"github.com/adaptocms/adapto-cms-cli/cmd/files"
 	"github.com/adaptocms/adapto-cms-cli/cmd/llminfo"
 	"github.com/adaptocms/adapto-cms-cli/cmd/microcopy"
+	"github.com/adaptocms/adapto-cms-cli/cmd/onboard"
+	"github.com/adaptocms/adapto-cms-cli/cmd/org"
 	"github.com/adaptocms/adapto-cms-cli/cmd/pages"
+	"github.com/adaptocms/adapto-cms-cli/cmd/project"
 	"github.com/adaptocms/adapto-cms-cli/cmd/status"
 	"github.com/adaptocms/adapto-cms-cli/internal/httpclient"
 	"github.com/spf13/cobra"
@@ -31,6 +35,10 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.AddCommand(auth.Cmd)
+	rootCmd.AddCommand(onboard.Cmd)
+	rootCmd.AddCommand(org.Cmd)
+	rootCmd.AddCommand(project.Cmd)
+	rootCmd.AddCommand(apikey.Cmd)
 	rootCmd.AddCommand(articles.Cmd)
 	rootCmd.AddCommand(categories.Cmd)
 	rootCmd.AddCommand(collections.Cmd)
