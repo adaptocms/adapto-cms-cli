@@ -28,13 +28,22 @@ Notes:
 
 ## Common Workflows
 
-### 1. Login and select a tenant
+### 1. Get set up
+
+Existing account:
 
 ```bash
 adapto auth login --email user@example.com --password secret
-# Interactive tenant picker appears if you have multiple tenants
-# Or specify directly:
+# multiple tenants? select one:
 adapto auth switch-tenant --tenant-id TENANT_ID
+```
+
+New account (the only manual step is pasting the activation token from the email):
+
+```bash
+adapto auth register --email user@example.com --password secret
+adapto auth activate --token <token-from-email>                      # activates and logs in
+adapto onboard --project-name "My Project" --default-language en-US  # creates project + API key, sets it active
 ```
 
 ### 2. List and create articles
@@ -165,5 +174,5 @@ adapto articles list --json --limit 100
 - Pagination: use `--page` and `--limit` flags. Responses include total, page, and pages fields.
 - Flags marked "(required)" will be prompted interactively if omitted in a TTY. In non-interactive mode, they must be provided.
 - Use `--json` on any command to get machine-readable JSON output.
-- `adapto collections items create-batch` is atomic: either every item in the batch is created or none is.
+- `adapto collections items create-batch` is atomic: either every item in the batch is created or none is. It accepts at most 100 items per request and prints the created items with their ids. A conflict error (409) means the items' slug + language combinations already exist in the collection — a previous attempt may have succeeded, so verify with `items list` instead of retrying; a validation error (400/422) means nothing was persisted.
 - HTTP errors include the request method and resolved URL — if the URL is not `https://api.adaptocms.com/...`, the CLI is misconfigured (see "Two APIs" above).

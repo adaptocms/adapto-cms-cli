@@ -275,7 +275,10 @@ func TestCreateBatchSendsAllItemsInOneRequest(t *testing.T) {
 	defer api.Close()
 
 	batchPath := "/manage/custom-collections/col1/items/batch"
-	api.Handle("POST", batchPath, 201, []any{})
+	api.Handle("POST", batchPath, 201, []any{
+		map[string]any{"id": "item-id-1", "title": "Jane Doe", "slug": "jane-doe", "status": "draft", "language": "en", "collection_id": "col1", "data": map[string]any{}, "created_at": "2026-01-01T00:00:00", "updated_at": "2026-01-01T00:00:00"},
+		map[string]any{"id": "item-id-2", "title": "John Doe", "slug": "john-doe", "status": "draft", "language": "en", "collection_id": "col1", "data": map[string]any{}, "created_at": "2026-01-01T00:00:00", "updated_at": "2026-01-01T00:00:00"},
+	})
 
 	itemsJSON := `{"items":[
 		{"title":"Jane Doe","slug":"jane-doe","language":"en","data":{"role":"Engineer"}},
@@ -301,6 +304,9 @@ func TestCreateBatchSendsAllItemsInOneRequest(t *testing.T) {
 	}
 	if reqs[0].TenantID != "t1" {
 		t.Fatalf("X-Tenant-ID = %q, want t1", reqs[0].TenantID)
+	}
+	if !strings.Contains(res.stdout, "item-id-1") || !strings.Contains(res.stdout, "item-id-2") {
+		t.Fatalf("stdout should list created item ids, got %q", res.stdout)
 	}
 }
 

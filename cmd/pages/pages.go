@@ -24,9 +24,10 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List pages",
-	Long:  "List pages with pagination and filters.",
+	Use:     "list",
+	Short:   "List pages",
+	Long:    "List pages with pagination and filters.",
+	Example: "adapto pages list --status published --language en-US --limit 10 --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -76,8 +77,9 @@ var listCmd = &cobra.Command{
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a page",
+	Use:     "create",
+	Short:   "Create a page",
+	Example: `adapto pages create --title "Home" --content "<p>Welcome</p>" --slug home --language en-US`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		content, _ := cmd.Flags().GetString("content")
@@ -152,9 +154,10 @@ var createCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get a page by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get a page by ID",
+	Example: "adapto pages get <page-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -179,9 +182,10 @@ var getCmd = &cobra.Command{
 }
 
 var getBySlugCmd = &cobra.Command{
-	Use:   "get-by-slug <slug>",
-	Short: "Get a page by slug",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-slug <slug>",
+	Short:   "Get a page by slug",
+	Example: "adapto pages get-by-slug home --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -206,10 +210,11 @@ var getBySlugCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update a page",
-	Long:  "Update a page. Only provided flags are changed.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update a page",
+	Long:    "Update a page. Only provided flags are changed.",
+	Example: `adapto pages update <page-id> --title "Home (Updated)" --status published`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -274,9 +279,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a page",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete a page",
+	Example: "adapto pages delete <page-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -297,9 +303,10 @@ var deleteCmd = &cobra.Command{
 }
 
 var publishCmd = &cobra.Command{
-	Use:   "publish <id>",
-	Short: "Publish a page",
-	Args:  cobra.ExactArgs(1),
+	Use:     "publish <id>",
+	Short:   "Publish a page",
+	Example: "adapto pages publish <page-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -320,9 +327,10 @@ var publishCmd = &cobra.Command{
 }
 
 var archiveCmd = &cobra.Command{
-	Use:   "archive <id>",
-	Short: "Archive a page",
-	Args:  cobra.ExactArgs(1),
+	Use:     "archive <id>",
+	Short:   "Archive a page",
+	Example: "adapto pages archive <page-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -343,9 +351,10 @@ var archiveCmd = &cobra.Command{
 }
 
 var translationsCmd = &cobra.Command{
-	Use:   "translations <id>",
-	Short: "List translations of a page",
-	Args:  cobra.ExactArgs(1),
+	Use:     "translations <id>",
+	Short:   "List translations of a page",
+	Example: "adapto pages translations <page-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -376,9 +385,10 @@ var translationsCmd = &cobra.Command{
 }
 
 var createTranslationCmd = &cobra.Command{
-	Use:   "create-translation <source_id>",
-	Short: "Create a page translation",
-	Args:  cobra.ExactArgs(1),
+	Use:     "create-translation <source_id>",
+	Short:   "Create a page translation",
+	Example: `adapto pages create-translation <source-page-id> --title "Accueil" --content "<p>Bienvenue</p>" --slug accueil --language fr-FR`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		content, _ := cmd.Flags().GetString("content")

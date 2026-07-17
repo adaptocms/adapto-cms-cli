@@ -22,26 +22,28 @@ Download the binary for your platform from [GitHub Releases](https://github.com/
 
 ## Quick Start
 
+**Existing account:**
+
 ```bash
-# Login (credentials are saved automatically)
 adapto auth login --email you@example.com --password yourpassword
+```
 
-# List articles
-adapto articles list
+**New account:**
 
-# Get JSON output
+```bash
+adapto auth register --email you@example.com --password yourpassword
+# the activation email contains a ready-to-run command:
+adapto auth activate --token <token-from-email>
+adapto onboard   # creates your first project + API key
+```
+
+Credentials are saved to `~/.config/adapto/credentials.json` and read automatically. The flow is flag-driven so an agent can run it end to end; the only manual step is pasting the activation token from the email.
+
+**Manage content:**
+
+```bash
 adapto articles list --json
-
-# Create an article (interactive prompts for missing fields)
-adapto articles create
-
-# Create with flags
-adapto articles create \
-  --title "My Article" \
-  --content "Hello world" \
-  --slug "my-article" \
-  --author "Jane" \
-  --language "en-US"
+adapto articles create --title "My Article" --content "Hello world" --slug my-article --author Jane --language en-US
 ```
 
 ## LLM Integration
@@ -76,6 +78,10 @@ All variables can also be passed as flags: `--token`, `--api-url`, `--tenant-id`
 
 ```
 adapto
+├── api-key                           Manage Public API keys
+│   ├── issue                       Issue a Public API key for the active project
+│   ├── list                        List the active project's API keys
+│   └── revoke [api-key-id]         Revoke an API key
 ├── articles                          Manage articles
 │   ├── archive <id>                Archive an article
 │   ├── categories <id>             List categories of an article
@@ -89,7 +95,7 @@ adapto
 │   ├── translations <id>           List translations of an article
 │   └── update <id>                 Update an article
 ├── auth                              Authentication commands
-│   ├── activate                    Activate account with token
+│   ├── activate                    Activate account and log in
 │   ├── callback-github             Complete GitHub OAuth callback
 │   ├── change-password             Change your password
 │   ├── login                       Login with email and password
@@ -160,6 +166,10 @@ adapto
 │   ├── list                        List micro copy entries
 │   ├── translations <id>           List translations of a micro copy entry
 │   └── update <id>                 Update a micro copy entry
+├── onboard                           Set up your first project and API key
+├── org                               Manage organizations
+│   ├── create                      Create an organization
+│   └── list                        List your organizations
 ├── pages                             Manage pages
 │   ├── archive <id>                Archive a page
 │   ├── create                      Create a page
@@ -171,6 +181,10 @@ adapto
 │   ├── publish <id>                Publish a page
 │   ├── translations <id>           List translations of a page
 │   └── update <id>                 Update a page
+├── project                           Manage projects
+│   ├── create                      Create a project
+│   ├── list                        List your projects
+│   └── use [project-id]            Set the active project
 ├── status                            API status commands
 │   └── version                     Get API version info
 └── version                           Print the CLI version

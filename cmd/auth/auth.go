@@ -3,6 +3,8 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/adaptocms/adapto-cms-cli/internal/client"
 	"github.com/adaptocms/adapto-cms-cli/internal/cmdutil"
@@ -63,7 +65,7 @@ var loginCmd = &cobra.Command{
 		}
 
 		resp, err := c.LoginPasswordAuthLoginPostWithResponse(cmdutil.Ctx(), client.LoginRequest{
-			Email:    openapi_types.Email(email),
+			Email:    email,
 			Password: password,
 		})
 		if err != nil {
@@ -110,8 +112,9 @@ var loginCmd = &cobra.Command{
 }
 
 var registerCmd = &cobra.Command{
-	Use:   "register",
-	Short: "Register a new account",
+	Use:     "register",
+	Short:   "Register a new account",
+	Example: "adapto auth register --email user@example.com --password secret --first-name Jane --last-name Doe",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
 		password, _ := cmd.Flags().GetString("password")
@@ -160,9 +163,10 @@ var registerCmd = &cobra.Command{
 }
 
 var logoutCmd = &cobra.Command{
-	Use:   "logout",
-	Short: "Logout (revoke refresh token)",
-	Long:  "Logout and revoke refresh token. Clears stored credentials.",
+	Use:     "logout",
+	Short:   "Logout (revoke refresh token)",
+	Long:    "Logout and revoke refresh token. Clears stored credentials.",
+	Example: "adapto auth logout --refresh-token <refresh-token>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		refreshToken, _ := cmd.Flags().GetString("refresh-token")
 
@@ -201,9 +205,10 @@ var logoutCmd = &cobra.Command{
 }
 
 var refreshCmd = &cobra.Command{
-	Use:   "refresh",
-	Short: "Refresh access token",
-	Long:  "Refresh the access token. Updates stored credentials.",
+	Use:     "refresh",
+	Short:   "Refresh access token",
+	Long:    "Refresh the access token. Updates stored credentials.",
+	Example: "adapto auth refresh --refresh-token <refresh-token>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		refreshToken, _ := cmd.Flags().GetString("refresh-token")
 
@@ -256,9 +261,10 @@ var refreshCmd = &cobra.Command{
 }
 
 var meCmd = &cobra.Command{
-	Use:   "me",
-	Short: "Get current user info",
-	Long:  "Get current user info (ID, email, status, name).",
+	Use:     "me",
+	Short:   "Get current user info",
+	Long:    "Get current user info (ID, email, status, name).",
+	Example: "adapto auth me",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -296,8 +302,9 @@ var meCmd = &cobra.Command{
 }
 
 var changePasswordCmd = &cobra.Command{
-	Use:   "change-password",
-	Short: "Change your password",
+	Use:     "change-password",
+	Short:   "Change your password",
+	Example: "adapto auth change-password --current-password secret --new-password newsecret",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		currentPassword, _ := cmd.Flags().GetString("current-password")
 		newPassword, _ := cmd.Flags().GetString("new-password")
@@ -332,8 +339,9 @@ var changePasswordCmd = &cobra.Command{
 }
 
 var requestPasswordResetCmd = &cobra.Command{
-	Use:   "request-password-reset",
-	Short: "Request a password reset email",
+	Use:     "request-password-reset",
+	Short:   "Request a password reset email",
+	Example: "adapto auth request-password-reset --email user@example.com",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
 		var err error
@@ -362,9 +370,10 @@ var requestPasswordResetCmd = &cobra.Command{
 }
 
 var resetPasswordCmd = &cobra.Command{
-	Use:   "reset-password",
-	Short: "Reset password with token",
-	Long:  "Reset password with a token received via email.",
+	Use:     "reset-password",
+	Short:   "Reset password with token",
+	Long:    "Reset password with a token received via email.",
+	Example: "adapto auth reset-password --token <reset-token> --new-password newsecret",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, _ := cmd.Flags().GetString("token")
 		newPassword, _ := cmd.Flags().GetString("new-password")
@@ -399,15 +408,17 @@ var resetPasswordCmd = &cobra.Command{
 }
 
 var activateCmd = &cobra.Command{
-	Use:   "activate",
-	Short: "Activate account with token",
-	Long:  "Activate account with a token received via email.",
+	Use:     "activate",
+	Short:   "Activate account and log in",
+	Long:    "Activate your account with the token from your activation email. Accepts a bare token or the full activation URL. On success you are logged in and credentials are saved.",
+	Example: "adapto auth activate --token <token>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token, _ := cmd.Flags().GetString("token")
 		var err error
 		if token, err = prompt.RequireArg("token", token); err != nil {
 			return err
 		}
+		token = extractActivationToken(token)
 
 		c, _, err := cmdutil.NewClient()
 		if err != nil {
@@ -424,14 +435,47 @@ var activateCmd = &cobra.Command{
 			return err
 		}
 
-		output.Success("Account activated successfully.")
+		var data map[string]interface{}
+		_ = json.Unmarshal(resp.Body, &data)
+		accessToken, _ := data["access_token"].(string)
+		refreshToken, _ := data["refresh_token"].(string)
+
+		if accessToken != "" {
+			creds := &credentials.Credentials{
+				AccessToken:  accessToken,
+				RefreshToken: refreshToken,
+			}
+			if err := credentials.Save(creds); err != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "Warning: could not save credentials: %v\n", err)
+			}
+		}
+
+		output.Print(map[string]interface{}{
+			"message":          "Account activated",
+			"credentials_path": credentials.Path(),
+		}, func(d interface{}) {
+			fmt.Println("Account activated and logged in.")
+			fmt.Println("Run 'adapto onboard' to set up your first project and API key.")
+		})
 		return nil
 	},
 }
 
+// extractActivationToken accepts a bare token or a full activation URL and returns the token.
+func extractActivationToken(input string) string {
+	input = strings.TrimSpace(input)
+	if u, err := url.Parse(input); err == nil {
+		if t := u.Query().Get("token"); t != "" {
+			return t
+		}
+	}
+	return input
+}
+
 var resendActivationCmd = &cobra.Command{
-	Use:   "resend-activation",
-	Short: "Resend activation email",
+	Use:     "resend-activation",
+	Short:   "Resend activation email",
+	Example: "adapto auth resend-activation --email user@example.com",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
 		var err error
@@ -460,9 +504,10 @@ var resendActivationCmd = &cobra.Command{
 }
 
 var loginGithubCmd = &cobra.Command{
-	Use:   "login-github",
-	Short: "Login via GitHub OAuth",
-	Long:  "Login via GitHub OAuth. Returns the OAuth URL to visit.",
+	Use:     "login-github",
+	Short:   "Login via GitHub OAuth",
+	Long:    "Login via GitHub OAuth. Returns the OAuth URL to visit.",
+	Example: "adapto auth login-github --redirect-uri https://app.example.com/oauth/callback",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		redirectURI, _ := cmd.Flags().GetString("redirect-uri")
 
@@ -491,8 +536,9 @@ var loginGithubCmd = &cobra.Command{
 }
 
 var callbackGithubCmd = &cobra.Command{
-	Use:   "callback-github",
-	Short: "Complete GitHub OAuth callback",
+	Use:     "callback-github",
+	Short:   "Complete GitHub OAuth callback",
+	Example: "adapto auth callback-github --code <oauth-code> --redirect-uri https://app.example.com/oauth/callback",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		code, _ := cmd.Flags().GetString("code")
 		redirectURI, _ := cmd.Flags().GetString("redirect-uri")
@@ -528,8 +574,9 @@ var callbackGithubCmd = &cobra.Command{
 }
 
 var loginGoogleCmd = &cobra.Command{
-	Use:   "login-google",
-	Short: "Login via Google credential",
+	Use:     "login-google",
+	Short:   "Login via Google credential",
+	Example: "adapto auth login-google --credential <google-id-token>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		credential, _ := cmd.Flags().GetString("credential")
 		var err error
@@ -594,8 +641,9 @@ func init() {
 }
 
 var switchTenantCmd = &cobra.Command{
-	Use:   "switch-tenant",
-	Short: "Switch active tenant/organization",
+	Use:     "switch-tenant",
+	Short:   "Switch active tenant/organization",
+	Example: "adapto auth switch-tenant --tenant-id <tenant-id>",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		tenantID, _ := cmd.Flags().GetString("tenant-id")
 
@@ -627,9 +675,10 @@ var switchTenantCmd = &cobra.Command{
 }
 
 var orgsCmd = &cobra.Command{
-	Use:   "orgs",
-	Short: "List your organizations and their tenants",
-	Long:  "List your organizations and their tenants, showing which tenant is active.",
+	Use:     "orgs",
+	Short:   "List your organizations and their tenants",
+	Long:    "List your organizations and their tenants, showing which tenant is active.",
+	Example: "adapto auth orgs",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {

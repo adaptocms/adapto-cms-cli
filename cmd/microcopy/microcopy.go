@@ -22,8 +22,9 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List micro copy entries",
+	Use:     "list",
+	Short:   "List micro copy entries",
+	Example: "adapto microcopy list --language en-US --tags cta --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -60,8 +61,9 @@ var listCmd = &cobra.Command{
 }
 
 var countCmd = &cobra.Command{
-	Use:   "count",
-	Short: "Count micro copy entries",
+	Use:     "count",
+	Short:   "Count micro copy entries",
+	Example: "adapto microcopy count --language en-US --tags cta --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -97,8 +99,9 @@ var countCmd = &cobra.Command{
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a micro copy entry",
+	Use:     "create",
+	Short:   "Create a micro copy entry",
+	Example: `adapto microcopy create --key "cta.signup" --value "Sign up" --language en-US --tags cta`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key, _ := cmd.Flags().GetString("key")
 		value, _ := cmd.Flags().GetString("value")
@@ -154,9 +157,10 @@ var createCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get micro copy by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get micro copy by ID",
+	Example: "adapto microcopy get <microcopy-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -181,9 +185,10 @@ var getCmd = &cobra.Command{
 }
 
 var getByKeyCmd = &cobra.Command{
-	Use:   "get-by-key <key>",
-	Short: "Get micro copy by key",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-key <key>",
+	Short:   "Get micro copy by key",
+	Example: `adapto microcopy get-by-key "cta.signup" --language en-US --json`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -212,9 +217,10 @@ var getByKeyCmd = &cobra.Command{
 }
 
 var getByLanguageCmd = &cobra.Command{
-	Use:   "get-by-language <language>",
-	Short: "Get all micro copy for a language",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-language <language>",
+	Short:   "Get all micro copy for a language",
+	Example: "adapto microcopy get-by-language en-US --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -245,9 +251,10 @@ var getByLanguageCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update a micro copy entry",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update a micro copy entry",
+	Example: `adapto microcopy update <microcopy-id> --value "Get started" --tags cta`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -292,9 +299,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a micro copy entry",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete a micro copy entry",
+	Example: "adapto microcopy delete <microcopy-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -315,9 +323,10 @@ var deleteCmd = &cobra.Command{
 }
 
 var translationsCmd = &cobra.Command{
-	Use:   "translations <id>",
-	Short: "List translations of a micro copy entry",
-	Args:  cobra.ExactArgs(1),
+	Use:     "translations <id>",
+	Short:   "List translations of a micro copy entry",
+	Example: "adapto microcopy translations <microcopy-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -348,9 +357,10 @@ var translationsCmd = &cobra.Command{
 }
 
 var createTranslationCmd = &cobra.Command{
-	Use:   "create-translation <source_id>",
-	Short: "Create a micro copy translation",
-	Args:  cobra.ExactArgs(1),
+	Use:     "create-translation <source_id>",
+	Short:   "Create a micro copy translation",
+	Example: `adapto microcopy create-translation <source-microcopy-id> --key "cta.signup" --value "Registrieren" --language de-DE`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key, _ := cmd.Flags().GetString("key")
 		value, _ := cmd.Flags().GetString("value")
