@@ -31,9 +31,10 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List files",
-	Long:  "List files with pagination and filters.",
+	Use:     "list",
+	Short:   "List files",
+	Long:    "List files with pagination and filters.",
+	Example: "adapto files list --type image --content-type image/png --limit 20 --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -94,8 +95,9 @@ var listCmd = &cobra.Command{
 }
 
 var createMetadataCmd = &cobra.Command{
-	Use:   "create-metadata",
-	Short: "Create file metadata (before upload)",
+	Use:     "create-metadata",
+	Short:   "Create file metadata (before upload)",
+	Example: "adapto files create-metadata --filename report.pdf --content-type application/pdf --tags docs,report --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		filename, _ := cmd.Flags().GetString("filename")
 		contentType, _ := cmd.Flags().GetString("content-type")
@@ -206,9 +208,10 @@ var uploadByIDCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get file info by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get file info by ID",
+	Example: "adapto files get <file-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -233,9 +236,10 @@ var getCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update file metadata",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update file metadata",
+	Example: "adapto files update <file-id> --filename renamed.pdf --tags archived,report --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -268,9 +272,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a file",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete a file",
+	Example: "adapto files delete <file-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -291,10 +296,11 @@ var deleteCmd = &cobra.Command{
 }
 
 var multipartInitCmd = &cobra.Command{
-	Use:   "multipart-init <file_id>",
-	Short: "Initialize a multipart upload",
-	Long:  "Initialize a multipart upload. Returns a file ID and upload ID.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "multipart-init <file_id>",
+	Short:   "Initialize a multipart upload",
+	Long:    "Initialize a multipart upload. Returns a file ID and upload ID.",
+	Example: "adapto files multipart-init <file-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -320,10 +326,11 @@ var multipartInitCmd = &cobra.Command{
 }
 
 var multipartUploadCmd = &cobra.Command{
-	Use:   "multipart-upload <file_id> <upload_id> <part_number> <filepath>",
-	Short: "Upload a part of a multipart upload",
-	Long:  "Upload a part. Outputs a curl command for the actual upload.",
-	Args:  cobra.ExactArgs(4),
+	Use:     "multipart-upload <file_id> <upload_id> <part_number> <filepath>",
+	Short:   "Upload a part of a multipart upload",
+	Long:    "Upload a part. Outputs a curl command for the actual upload.",
+	Example: "adapto files multipart-upload <file-id> <upload-id> 1 ./part-1.bin",
+	Args:    cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("multipart part upload uses multipart HTTP - use curl:\n  curl -X POST %s/manage/files/%s/multipart/%s/parts/%s -H 'Authorization: Bearer $ADAPTO_TOKEN' -F 'file=@%s'",
 			"$ADAPTO_API_URL", args[0], args[1], args[2], args[3])
@@ -331,9 +338,10 @@ var multipartUploadCmd = &cobra.Command{
 }
 
 var multipartCompleteCmd = &cobra.Command{
-	Use:   "multipart-complete <file_id> <upload_id>",
-	Short: "Complete a multipart upload",
-	Args:  cobra.ExactArgs(2),
+	Use:     "multipart-complete <file_id> <upload_id>",
+	Short:   "Complete a multipart upload",
+	Example: "adapto files multipart-complete <file-id> <upload-id> --parts '[{\"PartNumber\":1,\"ETag\":\"<etag>\"}]'",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		partsJSON, _ := cmd.Flags().GetString("parts")
 		var err error
@@ -365,9 +373,10 @@ var multipartCompleteCmd = &cobra.Command{
 }
 
 var multipartAbortCmd = &cobra.Command{
-	Use:   "multipart-abort <file_id> <upload_id>",
-	Short: "Abort a multipart upload",
-	Args:  cobra.ExactArgs(2),
+	Use:     "multipart-abort <file_id> <upload_id>",
+	Short:   "Abort a multipart upload",
+	Example: "adapto files multipart-abort <file-id> <upload-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {

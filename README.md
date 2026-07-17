@@ -76,6 +76,10 @@ All variables can also be passed as flags: `--token`, `--api-url`, `--tenant-id`
 
 ```
 adapto
+├── api-key                           Manage Public API keys
+│   ├── issue                       Issue a Public API key for the active project
+│   ├── list                        List the active project's API keys
+│   └── revoke [api-key-id]         Revoke an API key
 ├── articles                          Manage articles
 │   ├── archive <id>                Archive an article
 │   ├── categories <id>             List categories of an article
@@ -89,7 +93,7 @@ adapto
 │   ├── translations <id>           List translations of an article
 │   └── update <id>                 Update an article
 ├── auth                              Authentication commands
-│   ├── activate                    Activate account with token
+│   ├── activate                    Activate account and log in
 │   ├── callback-github             Complete GitHub OAuth callback
 │   ├── change-password             Change your password
 │   ├── login                       Login with email and password
@@ -160,6 +164,10 @@ adapto
 │   ├── list                        List micro copy entries
 │   ├── translations <id>           List translations of a micro copy entry
 │   └── update <id>                 Update a micro copy entry
+├── onboard                           Set up your first project and API key
+├── org                               Manage organizations
+│   ├── create                      Create an organization
+│   └── list                        List your organizations
 ├── pages                             Manage pages
 │   ├── archive <id>                Archive a page
 │   ├── create                      Create a page
@@ -171,6 +179,10 @@ adapto
 │   ├── publish <id>                Publish a page
 │   ├── translations <id>           List translations of a page
 │   └── update <id>                 Update a page
+├── project                           Manage projects
+│   ├── create                      Create a project
+│   ├── list                        List your projects
+│   └── use [project-id]            Set the active project
 ├── status                            API status commands
 │   └── version                     Get API version info
 └── version                           Print the CLI version

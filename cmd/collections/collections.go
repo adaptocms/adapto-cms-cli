@@ -30,9 +30,10 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List collections",
-	Long:  "List collections with pagination and filters.",
+	Use:     "list",
+	Short:   "List collections",
+	Long:    "List collections with pagination and filters.",
+	Example: "adapto collections list --language en-US --limit 20 --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -85,8 +86,9 @@ var listCmd = &cobra.Command{
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a collection",
+	Use:     "create",
+	Short:   "Create a collection",
+	Example: `adapto collections create --name "Showcase" --slug showcase --description "Portfolio of featured projects" --language en-US --fields-json '[{"name":"headline","label":"Headline","type":"text"}]'`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name, _ := cmd.Flags().GetString("name")
 		slug, _ := cmd.Flags().GetString("slug")
@@ -148,9 +150,10 @@ var createCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get a collection by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get a collection by ID",
+	Example: "adapto collections get <collection-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -175,9 +178,10 @@ var getCmd = &cobra.Command{
 }
 
 var getBySlugCmd = &cobra.Command{
-	Use:   "get-by-slug <slug>",
-	Short: "Get a collection by slug",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-slug <slug>",
+	Short:   "Get a collection by slug",
+	Example: "adapto collections get-by-slug showcase --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -202,10 +206,11 @@ var getBySlugCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update a collection",
-	Long:  "Update a collection. Only provided flags are changed.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update a collection",
+	Long:    "Update a collection. Only provided flags are changed.",
+	Example: `adapto collections update <collection-id> --name "Showcase" --status published`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -255,9 +260,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a collection",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete a collection",
+	Example: "adapto collections delete <collection-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -280,9 +286,10 @@ var deleteCmd = &cobra.Command{
 // --- Items subcommands ---
 
 var itemsListCmd = &cobra.Command{
-	Use:   "list <collection_id>",
-	Short: "List items in a collection",
-	Args:  cobra.ExactArgs(1),
+	Use:     "list <collection_id>",
+	Short:   "List items in a collection",
+	Example: "adapto collections items list <collection-id> --status published --limit 20 --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -410,7 +417,8 @@ var itemsCreateBatchCmd = &cobra.Command{
 	Long: "Create multiple items in one atomic request: either every item is created or none is (any validation or database failure rolls back the whole batch). " +
 		"Accepts at most 100 items per request and returns the created items with their ids. " +
 		"A slug + language combination that already exists in the collection fails the whole batch with a conflict error.",
-	Args:  cobra.ExactArgs(1),
+	Example: `adapto collections items create-batch <collection-id> --items-json '{"items":[{"title":"First Item","slug":"first-item","language":"en-US","data":{"headline":"Hello"}}]}'`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		itemsJSON, _ := cmd.Flags().GetString("items-json")
 		var err error
@@ -453,9 +461,10 @@ var itemsCreateBatchCmd = &cobra.Command{
 }
 
 var itemsGetCmd = &cobra.Command{
-	Use:   "get <collection_id> <item_id>",
-	Short: "Get a collection item",
-	Args:  cobra.ExactArgs(2),
+	Use:     "get <collection_id> <item_id>",
+	Short:   "Get a collection item",
+	Example: "adapto collections items get <collection-id> <item-id> --json",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -480,9 +489,10 @@ var itemsGetCmd = &cobra.Command{
 }
 
 var itemsGetBySlugCmd = &cobra.Command{
-	Use:   "get-by-slug <collection_id> <slug>",
-	Short: "Get a collection item by slug",
-	Args:  cobra.ExactArgs(2),
+	Use:     "get-by-slug <collection_id> <slug>",
+	Short:   "Get a collection item by slug",
+	Example: "adapto collections items get-by-slug <collection-id> first-item --json",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -507,10 +517,11 @@ var itemsGetBySlugCmd = &cobra.Command{
 }
 
 var itemsUpdateCmd = &cobra.Command{
-	Use:   "update <collection_id> <item_id>",
-	Short: "Update a collection item",
-	Long:  "Update a collection item. Only provided flags are changed.",
-	Args:  cobra.ExactArgs(2),
+	Use:     "update <collection_id> <item_id>",
+	Short:   "Update a collection item",
+	Long:    "Update a collection item. Only provided flags are changed.",
+	Example: `adapto collections items update <collection-id> <item-id> --title "Updated Item" --status published`,
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -564,9 +575,10 @@ var itemsUpdateCmd = &cobra.Command{
 }
 
 var itemsDeleteCmd = &cobra.Command{
-	Use:   "delete <collection_id> <item_id>",
-	Short: "Delete a collection item",
-	Args:  cobra.ExactArgs(2),
+	Use:     "delete <collection_id> <item_id>",
+	Short:   "Delete a collection item",
+	Example: "adapto collections items delete <collection-id> <item-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -587,9 +599,10 @@ var itemsDeleteCmd = &cobra.Command{
 }
 
 var itemsPublishCmd = &cobra.Command{
-	Use:   "publish <collection_id> <item_id>",
-	Short: "Publish a collection item",
-	Args:  cobra.ExactArgs(2),
+	Use:     "publish <collection_id> <item_id>",
+	Short:   "Publish a collection item",
+	Example: "adapto collections items publish <collection-id> <item-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -610,9 +623,10 @@ var itemsPublishCmd = &cobra.Command{
 }
 
 var itemsArchiveCmd = &cobra.Command{
-	Use:   "archive <collection_id> <item_id>",
-	Short: "Archive a collection item",
-	Args:  cobra.ExactArgs(2),
+	Use:     "archive <collection_id> <item_id>",
+	Short:   "Archive a collection item",
+	Example: "adapto collections items archive <collection-id> <item-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -633,9 +647,10 @@ var itemsArchiveCmd = &cobra.Command{
 }
 
 var itemsTranslationsCmd = &cobra.Command{
-	Use:   "translations <collection_id> <item_id>",
-	Short: "List translations of an item",
-	Args:  cobra.ExactArgs(2),
+	Use:     "translations <collection_id> <item_id>",
+	Short:   "List translations of an item",
+	Example: "adapto collections items translations <collection-id> <item-id> --json",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -666,9 +681,10 @@ var itemsTranslationsCmd = &cobra.Command{
 }
 
 var itemsCreateTranslationCmd = &cobra.Command{
-	Use:   "create-translation <collection_id> <source_id>",
-	Short: "Create an item translation",
-	Args:  cobra.ExactArgs(2),
+	Use:     "create-translation <collection_id> <source_id>",
+	Short:   "Create an item translation",
+	Example: `adapto collections items create-translation <collection-id> <source-item-id> --title "Élément vedette" --slug element-vedette --language fr-FR --data-json '{"headline":"Bonjour"}'`,
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		slug, _ := cmd.Flags().GetString("slug")

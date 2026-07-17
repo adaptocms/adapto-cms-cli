@@ -10,9 +10,10 @@ import (
 )
 
 var Cmd = &cobra.Command{
-	Use:   "status",
-	Short: "API status commands",
-	Long:  "Check API status. Running 'adapto status' directly returns the API health status.",
+	Use:     "status",
+	Short:   "API status commands",
+	Long:    "Check API status. Running 'adapto status' directly returns the API health status.",
+	Example: "adapto status --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -44,8 +45,9 @@ func init() {
 }
 
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Get API version info",
+	Use:     "version",
+	Short:   "Get API version info",
+	Example: "adapto status version --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {

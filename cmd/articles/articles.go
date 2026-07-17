@@ -170,9 +170,10 @@ var createCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get an article by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get an article by ID",
+	Example: "adapto articles get <article-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -197,9 +198,10 @@ var getCmd = &cobra.Command{
 }
 
 var getBySlugCmd = &cobra.Command{
-	Use:   "get-by-slug <slug>",
-	Short: "Get an article by slug",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-slug <slug>",
+	Short:   "Get an article by slug",
+	Example: "adapto articles get-by-slug hello-world --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -224,10 +226,11 @@ var getBySlugCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update an article",
-	Long:  "Update an article. Only provided flags are changed.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update an article",
+	Long:    "Update an article. Only provided flags are changed.",
+	Example: `adapto articles update <article-id> --title "Updated Title" --status published`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -299,9 +302,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete an article",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete an article",
+	Example: "adapto articles delete <article-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -322,10 +326,11 @@ var deleteCmd = &cobra.Command{
 }
 
 var publishCmd = &cobra.Command{
-	Use:   "publish <id>",
-	Short: "Publish an article",
-	Long:  "Publish an article (set status to published).",
-	Args:  cobra.ExactArgs(1),
+	Use:     "publish <id>",
+	Short:   "Publish an article",
+	Long:    "Publish an article (set status to published).",
+	Example: "adapto articles publish <article-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -346,9 +351,10 @@ var publishCmd = &cobra.Command{
 }
 
 var archiveCmd = &cobra.Command{
-	Use:   "archive <id>",
-	Short: "Archive an article",
-	Args:  cobra.ExactArgs(1),
+	Use:     "archive <id>",
+	Short:   "Archive an article",
+	Example: "adapto articles archive <article-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -369,9 +375,10 @@ var archiveCmd = &cobra.Command{
 }
 
 var translationsCmd = &cobra.Command{
-	Use:   "translations <id>",
-	Short: "List translations of an article",
-	Args:  cobra.ExactArgs(1),
+	Use:     "translations <id>",
+	Short:   "List translations of an article",
+	Example: "adapto articles translations <article-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -402,9 +409,10 @@ var translationsCmd = &cobra.Command{
 }
 
 var createTranslationCmd = &cobra.Command{
-	Use:   "create-translation <source_id>",
-	Short: "Create an article translation",
-	Args:  cobra.ExactArgs(1),
+	Use:     "create-translation <source_id>",
+	Short:   "Create an article translation",
+	Example: `adapto articles create-translation <source-article-id> --title "Bonjour le monde" --content "<p>Contenu</p>" --slug bonjour-le-monde --author "Jane" --language fr-FR`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		title, _ := cmd.Flags().GetString("title")
 		content, _ := cmd.Flags().GetString("content")
@@ -487,10 +495,11 @@ var createTranslationCmd = &cobra.Command{
 }
 
 var categoriesCmd = &cobra.Command{
-	Use:   "categories <id>",
-	Short: "List categories of an article",
-	Long:  "List category IDs associated with an article.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "categories <id>",
+	Short:   "List categories of an article",
+	Long:    "List category IDs associated with an article.",
+	Example: "adapto articles categories <article-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {

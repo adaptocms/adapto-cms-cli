@@ -24,9 +24,10 @@ func init() {
 }
 
 var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List categories",
-	Long:  "List categories with pagination and filters.",
+	Use:     "list",
+	Short:   "List categories",
+	Long:    "List categories with pagination and filters.",
+	Example: "adapto categories list --language en-US --limit 20 --json",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -85,8 +86,9 @@ var listCmd = &cobra.Command{
 }
 
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a category",
+	Use:     "create",
+	Short:   "Create a category",
+	Example: `adapto categories create --name "Guides" --slug guides --language en-US --description "How-to guides"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name, _ := cmd.Flags().GetString("name")
 		slug, _ := cmd.Flags().GetString("slug")
@@ -142,9 +144,10 @@ var createCmd = &cobra.Command{
 }
 
 var getCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get a category by ID",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get <id>",
+	Short:   "Get a category by ID",
+	Example: "adapto categories get <category-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -169,9 +172,10 @@ var getCmd = &cobra.Command{
 }
 
 var getBySlugCmd = &cobra.Command{
-	Use:   "get-by-slug <slug>",
-	Short: "Get a category by slug",
-	Args:  cobra.ExactArgs(1),
+	Use:     "get-by-slug <slug>",
+	Short:   "Get a category by slug",
+	Example: "adapto categories get-by-slug guides --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -196,10 +200,11 @@ var getBySlugCmd = &cobra.Command{
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update <id>",
-	Short: "Update a category",
-	Long:  "Update a category. Only provided flags are changed.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "update <id>",
+	Short:   "Update a category",
+	Long:    "Update a category. Only provided flags are changed.",
+	Example: `adapto categories update <category-id> --name "Updated Guides" --slug updated-guides`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -247,9 +252,10 @@ var updateCmd = &cobra.Command{
 }
 
 var deleteCmd = &cobra.Command{
-	Use:   "delete <id>",
-	Short: "Delete a category",
-	Args:  cobra.ExactArgs(1),
+	Use:     "delete <id>",
+	Short:   "Delete a category",
+	Example: "adapto categories delete <category-id>",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -270,9 +276,10 @@ var deleteCmd = &cobra.Command{
 }
 
 var subcategoriesCmd = &cobra.Command{
-	Use:   "subcategories <id>",
-	Short: "List subcategories",
-	Args:  cobra.ExactArgs(1),
+	Use:     "subcategories <id>",
+	Short:   "List subcategories",
+	Example: "adapto categories subcategories <category-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -303,10 +310,11 @@ var subcategoriesCmd = &cobra.Command{
 }
 
 var articlesCmd = &cobra.Command{
-	Use:   "articles <category_id>",
-	Short: "List articles in a category",
-	Long:  "List article IDs in a category.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "articles <category_id>",
+	Short:   "List articles in a category",
+	Long:    "List article IDs in a category.",
+	Example: "adapto categories articles <category-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -337,9 +345,10 @@ var articlesCmd = &cobra.Command{
 }
 
 var addArticleCmd = &cobra.Command{
-	Use:   "add-article <category_id> <article_id>",
-	Short: "Add an article to a category",
-	Args:  cobra.ExactArgs(2),
+	Use:     "add-article <category_id> <article_id>",
+	Short:   "Add an article to a category",
+	Example: "adapto categories add-article <category-id> <article-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -360,9 +369,10 @@ var addArticleCmd = &cobra.Command{
 }
 
 var removeArticleCmd = &cobra.Command{
-	Use:   "remove-article <category_id> <article_id>",
-	Short: "Remove an article from a category",
-	Args:  cobra.ExactArgs(2),
+	Use:     "remove-article <category_id> <article_id>",
+	Short:   "Remove an article from a category",
+	Example: "adapto categories remove-article <category-id> <article-id>",
+	Args:    cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -383,9 +393,10 @@ var removeArticleCmd = &cobra.Command{
 }
 
 var translationsCmd = &cobra.Command{
-	Use:   "translations <id>",
-	Short: "List translations of a category",
-	Args:  cobra.ExactArgs(1),
+	Use:     "translations <id>",
+	Short:   "List translations of a category",
+	Example: "adapto categories translations <category-id> --json",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, _, err := cmdutil.NewClientWithAuth()
 		if err != nil {
@@ -416,9 +427,10 @@ var translationsCmd = &cobra.Command{
 }
 
 var createTranslationCmd = &cobra.Command{
-	Use:   "create-translation <source_id>",
-	Short: "Create a category translation",
-	Args:  cobra.ExactArgs(1),
+	Use:     "create-translation <source_id>",
+	Short:   "Create a category translation",
+	Example: `adapto categories create-translation <source-category-id> --name "Guías" --slug guias --language es-ES`,
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name, _ := cmd.Flags().GetString("name")
 		slug, _ := cmd.Flags().GetString("slug")

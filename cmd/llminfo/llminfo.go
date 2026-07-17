@@ -17,9 +17,10 @@ var postamble string
 
 // Cmd is the llm-info command.
 var Cmd = &cobra.Command{
-	Use:   "llm-info",
-	Short: "Print full CLI reference for LLM consumption",
-	Long:  "Output a comprehensive markdown description of every command, flag, and workflow so an LLM agent can understand and use the Adapto CMS CLI. The command reference is generated from the live command tree, so it cannot diverge from the actual CLI.",
+	Use:     "llm-info",
+	Short:   "Print full CLI reference for LLM consumption",
+	Long:    "Output a comprehensive markdown description of every command, flag, and workflow so an LLM agent can understand and use the Adapto CMS CLI. The command reference is generated from the live command tree, so it cannot diverge from the actual CLI.",
+	Example: "adapto llm-info",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Print(reference(cmd.Root()))
 	},
