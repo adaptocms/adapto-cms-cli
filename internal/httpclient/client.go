@@ -31,6 +31,7 @@ func New(cfg config.Config) (*client.ClientWithResponses, error) {
 
 	opts := []client.ClientOption{
 		client.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
+			req.Header.Set("X-Adapto-Client", "cli")
 			if cfg.Token != "" {
 				req.Header.Set("Authorization", "Bearer "+cfg.Token)
 			}
