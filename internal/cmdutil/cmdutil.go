@@ -258,6 +258,85 @@ func ResolveOrgID(c *client.ClientWithResponses, explicit string) (string, error
 	return prompt.AskSelect("Select an organization:", options)
 }
 
+// SelectProjectInActiveOrg opens a selector over the projects in the active
+// project's organization, and returns the chosen project. When no project is
+// active it falls back to selecting an organization first.
+func SelectProjectInActiveOrg(c *client.ClientWithResponses, activeID string) (*client.Tenant, error) {
+	orgID := ""
+	if activeID != "" {
+		if tResp, err := c.GetTenantTenantsTenantIdGetWithResponse(Ctx(), activeID); err == nil && tResp.JSON200 != nil {
+			orgID = tResp.JSON200.OrganizationId
+		}
+	}
+	if orgID == "" {
+		var err error
+		if orgID, err = ResolveOrgID(c, ""); err != nil {
+			return nil, err
+		}
+	}
+
+	resp, err := c.ListOrgTenantsTenantsByOrgOrgIdGetWithResponse(Ctx(), orgID)
+	if err != nil {
+		return nil, err
+	}
+	if err := CheckErr(resp.HTTPResponse, resp.Body); err != nil {
+		return nil, err
+	}
+	tenants := []client.Tenant{}
+	if resp.JSON200 != nil {
+		tenants = *resp.JSON200
+	}
+	if len(tenants) == 0 {
+		return nil, fmt.Errorf("no projects found in this organization")
+	}
+
+	options := make([]huh.Option[string], 0, len(tenants))
+	for _, t := range tenants {
+		options = append(options, huh.NewOption(fmt.Sprintf("%s  %v", t.Name, t.EnabledLanguages), t.Id))
+	}
+	id, err := prompt.AskSelect("Select a project to delete:", options)
+	if err != nil {
+		return nil, err
+	}
+	for i := range tenants {
+		if tenants[i].Id == id {
+			return &tenants[i], nil
+		}
+	}
+	return nil, fmt.Errorf("selected project not found")
+}
+
+// SelectProjectAllOrgs opens a selector over every project in every
+// organization the user belongs to, each labelled with its organization, and
+// returns the chosen project id.
+func SelectProjectAllOrgs(c *client.ClientWithResponses) (string, error) {
+	orgsResp, err := c.ListMyOrgsOrgsGetWithResponse(Ctx())
+	if err != nil {
+		return "", err
+	}
+	if err := CheckErr(orgsResp.HTTPResponse, orgsResp.Body); err != nil {
+		return "", err
+	}
+	if orgsResp.JSON200 == nil || len(*orgsResp.JSON200) == 0 {
+		return "", fmt.Errorf("no organizations found for your account")
+	}
+
+	var options []huh.Option[string]
+	for _, o := range *orgsResp.JSON200 {
+		tResp, err := c.ListOrgTenantsTenantsByOrgOrgIdGetWithResponse(Ctx(), o.Id)
+		if err != nil || tResp.JSON200 == nil {
+			continue
+		}
+		for _, t := range *tResp.JSON200 {
+			options = append(options, huh.NewOption(fmt.Sprintf("%s / %s  %v", o.Name, t.Name, t.EnabledLanguages), t.Id))
+		}
+	}
+	if len(options) == 0 {
+		return "", fmt.Errorf("no projects found; create one with 'adapto project create'")
+	}
+	return prompt.AskSelect("Select a project:", options)
+}
+
 // StringSlicePtr returns a pointer to a string slice parsed from comma-separated input, or nil if empty.
 func StringSlicePtr(s string) *[]string {
 	if s == "" {

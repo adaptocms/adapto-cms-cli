@@ -8,6 +8,7 @@ import (
 	"github.com/adaptocms/adapto-cms-cli/internal/credentials"
 	"github.com/adaptocms/adapto-cms-cli/internal/output"
 	"github.com/adaptocms/adapto-cms-cli/internal/prompt"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
@@ -141,9 +142,14 @@ var listCmd = &cobra.Command{
 }
 
 var useCmd = &cobra.Command{
-	Use:     "use [project-id]",
-	Short:   "Set the active project",
-	Example: "adapto project use <project-id>",
+	Use:   "use [project-id]",
+	Short: "Set the active project",
+	Long: `Set the active project used by content and API-key commands.
+
+Run without arguments to pick from a selector listing every project across all
+your organizations. Pass a project id (positionally or with --project-id) to
+set it directly; the id is validated before it is saved.`,
+	Example: "  adapto project use\n  adapto project use <project-id>",
 	Args:    cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		projectID, _ := cmd.Flags().GetString("project-id")
@@ -151,9 +157,26 @@ var useCmd = &cobra.Command{
 			projectID = args[0]
 		}
 
-		var err error
-		if projectID, err = prompt.RequireArg("project-id", projectID); err != nil {
+		c, _, err := cmdutil.NewClientWithAuth()
+		if err != nil {
 			return err
+		}
+
+		if projectID == "" {
+			if !prompt.IsTTY() {
+				return fmt.Errorf("no project id given: pass a project id (or --project-id) in a non-interactive shell")
+			}
+			if projectID, err = cmdutil.SelectProjectAllOrgs(c); err != nil {
+				return err
+			}
+		} else {
+			tResp, err := c.GetTenantTenantsTenantIdGetWithResponse(cmdutil.Ctx(), projectID)
+			if err != nil {
+				return err
+			}
+			if err := cmdutil.CheckErr(tResp.HTTPResponse, tResp.Body); err != nil {
+				return fmt.Errorf("project %s not found or not accessible: %w", projectID, err)
+			}
 		}
 
 		creds, err := credentials.Load()
@@ -170,10 +193,173 @@ var useCmd = &cobra.Command{
 	},
 }
 
+var updateCmd = &cobra.Command{
+	Use:   "update [project-id]",
+	Short: "Update a project",
+	Long: `Update a project's name, description, or languages. Only provided flags are changed.
+
+Run without a project id to pick one from a selector.`,
+	Example: "  adapto project update --name \"New Name\"\n" +
+		"  adapto project update <project-id> --description \"Marketing content\" --languages en-US,fr-FR",
+	Args: cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body := client.UpdateTenantRequest{}
+		changed := false
+		if v, _ := cmd.Flags().GetString("name"); v != "" {
+			body.Name = &v
+			changed = true
+		}
+		if v, _ := cmd.Flags().GetString("description"); v != "" {
+			body.Description = &v
+			changed = true
+		}
+		if v, _ := cmd.Flags().GetStringSlice("languages"); len(v) > 0 {
+			body.EnabledLanguages = &v
+			changed = true
+		}
+		if !changed {
+			return fmt.Errorf("nothing to update: pass --name, --description, or --languages")
+		}
+
+		projectID, _ := cmd.Flags().GetString("project-id")
+		if len(args) > 0 {
+			projectID = args[0]
+		}
+
+		c, _, err := cmdutil.NewClientWithAuth()
+		if err != nil {
+			return err
+		}
+
+		if projectID == "" {
+			if !prompt.IsTTY() {
+				return fmt.Errorf("no project id given: pass a project id (or --project-id) in a non-interactive shell")
+			}
+			if projectID, err = cmdutil.SelectProjectAllOrgs(c); err != nil {
+				return err
+			}
+		}
+
+		resp, err := c.UpdateTenantTenantsTenantIdPatchWithResponse(cmdutil.Ctx(), projectID, body)
+		if err != nil {
+			return err
+		}
+		if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
+			return err
+		}
+
+		if resp.JSON200 != nil {
+			tenant := *resp.JSON200
+			output.Print(tenant, func(d interface{}) {
+				fmt.Printf("Project updated: %s (%s)\n", tenant.Name, tenant.Id)
+			})
+		} else {
+			output.Successf("Project %s updated.", projectID)
+		}
+		return nil
+	},
+}
+
+var deleteCmd = &cobra.Command{
+	Use:   "delete [project-id]",
+	Short: "Delete a project and all its content",
+	Long: `Delete a project, permanently destroying all content scoped to it.
+
+Run without arguments to pick a project from an interactive selector; you are
+then asked to type the project name to confirm before anything is deleted.
+
+Pass a project id (positionally or with --project-id) to delete it immediately,
+with no confirmation prompt — the explicit id is treated as the confirmation.
+This is the form for scripts and AI agents. In a non-interactive shell you must
+pass an id, since the selector cannot open.`,
+	Example: "  # Pick from a selector, then type the name to confirm\n" +
+		"  adapto project delete\n\n" +
+		"  # Delete immediately by id, no prompt\n" +
+		"  adapto project delete <project-id>\n" +
+		"  adapto project delete --project-id <project-id>",
+	Args: cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		projectID, _ := cmd.Flags().GetString("project-id")
+		if len(args) > 0 {
+			projectID = args[0]
+		}
+
+		c, cfg, err := cmdutil.NewClientWithAuth()
+		if err != nil {
+			return err
+		}
+
+		if projectID != "" {
+			return deleteProject(cmd, c, projectID)
+		}
+
+		if !prompt.IsTTY() {
+			return fmt.Errorf("no project id given: pass a project id (or --project-id) in a non-interactive shell")
+		}
+
+		tenant, err := cmdutil.SelectProjectInActiveOrg(c, cfg.TenantID)
+		if err != nil {
+			return err
+		}
+
+		printDeleteWarning(cmd, tenant)
+		for {
+			typed, err := prompt.AskString("Type the project name to confirm (leave empty to cancel):")
+			if err != nil {
+				return err
+			}
+			if typed == tenant.Name {
+				break
+			}
+			if typed == "" {
+				output.Success("Cancelled; project not deleted.")
+				return nil
+			}
+			fmt.Fprintf(cmd.ErrOrStderr(), "That does not match %q. Try again, or leave empty to cancel.\n", tenant.Name)
+		}
+
+		return deleteProject(cmd, c, tenant.Id)
+	},
+}
+
+func printDeleteWarning(cmd *cobra.Command, t *client.Tenant) {
+	red := lipgloss.NewStyle().Foreground(lipgloss.Color("9")).Bold(true)
+	w := cmd.ErrOrStderr()
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, red.Render(fmt.Sprintf("⚠  Deleting project %q permanently removes it and ALL of its content —", t.Name)))
+	fmt.Fprintln(w, red.Render("   articles, pages, collections, files, micro copy, and API keys. This cannot be undone."))
+	fmt.Fprintln(w)
+}
+
+func deleteProject(cmd *cobra.Command, c *client.ClientWithResponses, id string) error {
+	resp, err := c.DeleteTenantTenantsTenantIdDeleteWithResponse(cmdutil.Ctx(), id)
+	if err != nil {
+		return err
+	}
+	if err := cmdutil.CheckErr(resp.HTTPResponse, resp.Body); err != nil {
+		return err
+	}
+
+	output.Successf("Project %s deleted.", id)
+
+	if creds, err := credentials.Load(); err == nil && creds.TenantID == id {
+		creds.TenantID = ""
+		if err := credentials.Save(creds); err != nil {
+			fmt.Fprintf(cmd.ErrOrStderr(), "Warning: could not clear active project: %v\n", err)
+		} else if refreshErr := cmdutil.RefreshSession(); refreshErr != nil {
+			fmt.Fprintf(cmd.ErrOrStderr(), "Warning: could not refresh session: %v\n", refreshErr)
+		}
+		output.Success("This was your active project. Run 'adapto project use' to pick another.")
+	}
+	return nil
+}
+
 func init() {
 	Cmd.AddCommand(createCmd)
 	Cmd.AddCommand(listCmd)
 	Cmd.AddCommand(useCmd)
+	Cmd.AddCommand(updateCmd)
+	Cmd.AddCommand(deleteCmd)
 
 	createCmd.Flags().String("name", "", "Project name (required)")
 	createCmd.Flags().String("description", "", "Project description")
@@ -181,5 +367,12 @@ func init() {
 	createCmd.Flags().String("default-language", "", "Default language code (default en-US)")
 	createCmd.Flags().StringSlice("languages", nil, "Additional language codes (comma-separated)")
 
-	useCmd.Flags().String("project-id", "", "Project ID to set active")
+	useCmd.Flags().String("project-id", "", "Project ID to set active (opens a selector if omitted)")
+
+	updateCmd.Flags().String("name", "", "New project name")
+	updateCmd.Flags().String("description", "", "New project description")
+	updateCmd.Flags().StringSlice("languages", nil, "Replacement language codes (comma-separated)")
+	updateCmd.Flags().String("project-id", "", "Project ID to update (opens a selector if omitted)")
+
+	deleteCmd.Flags().String("project-id", "", "Project ID to delete immediately, without confirmation (opens a selector if omitted)")
 }

@@ -183,7 +183,9 @@ adapto
 │   └── update <id>                 Update a page
 ├── project                           Manage projects
 │   ├── create                      Create a project
+│   ├── delete [project-id]         Delete a project and all its content
 │   ├── list                        List your projects
+│   ├── update [project-id]         Update a project
 │   └── use [project-id]            Set the active project
 ├── status                            API status commands
 │   └── version                     Get API version info

@@ -310,6 +310,163 @@ func TestCreateBatchSendsAllItemsInOneRequest(t *testing.T) {
 	}
 }
 
+func TestProjectUpdateByIdPatchesOnlyProvidedFields(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	api.Handle("PATCH", "/tenants/t2", 200, client.Tenant{
+		Id: "t2", Name: "Renamed", OrganizationId: "org1", EnabledLanguages: []string{"en-US", "fr-FR"},
+	})
+
+	res := run(t, home, apiEnv(api), "project", "update", "t2", "--name", "Renamed", "--languages", "en-US,fr-FR")
+	if res.exitCode != 0 {
+		t.Fatalf("exit = %d, stderr = %q", res.exitCode, res.stderr)
+	}
+	reqs := api.RequestsTo("PATCH", "/tenants/t2")
+	if len(reqs) != 1 {
+		t.Fatalf("want exactly one PATCH /tenants/t2, got %+v", api.Requests())
+	}
+	var sent map[string]any
+	if err := json.Unmarshal(reqs[0].Body, &sent); err != nil {
+		t.Fatal(err)
+	}
+	if sent["name"] != "Renamed" {
+		t.Fatalf("body name = %v, want Renamed", sent["name"])
+	}
+	if _, ok := sent["enabled_languages"]; !ok {
+		t.Fatalf("body = %s, want enabled_languages present", reqs[0].Body)
+	}
+	if _, ok := sent["description"]; ok {
+		t.Fatalf("body = %s, want description omitted (not provided)", reqs[0].Body)
+	}
+	if !strings.Contains(res.stdout, "Renamed") {
+		t.Fatalf("stdout = %q, want updated project name", res.stdout)
+	}
+}
+
+func TestProjectUpdateRequiresAField(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	res := run(t, home, apiEnv(api), "project", "update", "t2")
+	if res.exitCode == 0 {
+		t.Fatal("expected nonzero exit when no fields are given")
+	}
+	if !strings.Contains(res.stderr, "nothing to update") {
+		t.Fatalf("stderr = %q, want 'nothing to update'", res.stderr)
+	}
+	if len(api.Requests()) != 0 {
+		t.Fatalf("expected no API requests, got %+v", api.Requests())
+	}
+}
+
+func TestProjectDeleteByIdIsInstant(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	api.Handle("DELETE", "/tenants/t2", 200, map[string]string{"status": "ok"})
+
+	res := run(t, home, apiEnv(api), "project", "delete", "--project-id", "t2")
+	if res.exitCode != 0 {
+		t.Fatalf("exit = %d, stderr = %q", res.exitCode, res.stderr)
+	}
+	if len(api.RequestsTo("DELETE", "/tenants/t2")) != 1 {
+		t.Fatalf("want exactly one DELETE /tenants/t2, got %+v", api.Requests())
+	}
+	if creds := loadCredentials(t, home); creds["tenant_id"] != "t1" {
+		t.Fatalf("active project changed to %q, want it left as t1", creds["tenant_id"])
+	}
+}
+
+func TestProjectDeleteActiveClearsSelection(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	api.Handle("DELETE", "/tenants/t1", 200, map[string]string{"status": "ok"})
+	api.Handle("POST", "/auth/refresh", 200, map[string]string{"access_token": "fresh", "refresh_token": "rt2"})
+
+	res := run(t, home, apiEnv(api), "project", "delete", "t1")
+	if res.exitCode != 0 {
+		t.Fatalf("exit = %d, stderr = %q", res.exitCode, res.stderr)
+	}
+	if !strings.Contains(res.stdout, "active project") {
+		t.Fatalf("stdout = %q, want a notice that the active project was deleted", res.stdout)
+	}
+	creds := loadCredentials(t, home)
+	if creds["tenant_id"] != "" {
+		t.Fatalf("tenant_id = %q, want it cleared", creds["tenant_id"])
+	}
+	if creds["access_token"] != "fresh" || creds["refresh_token"] != "rt2" {
+		t.Fatalf("session not refreshed after self-delete: %v", creds)
+	}
+}
+
+func TestProjectDeleteNonInteractiveRequiresId(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	res := run(t, home, apiEnv(api), "project", "delete")
+	if res.exitCode == 0 {
+		t.Fatal("expected nonzero exit when no id is given in a non-interactive shell")
+	}
+	if !strings.Contains(res.stderr, "no project id given") {
+		t.Fatalf("stderr = %q, want 'no project id given'", res.stderr)
+	}
+	if len(api.Requests()) != 0 {
+		t.Fatalf("expected no API requests, got %+v", api.Requests())
+	}
+}
+
+func TestProjectUseByIdValidatesBeforeSaving(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	api.Handle("GET", "/tenants/t2", 200, client.Tenant{
+		Id: "t2", Name: "Second", OrganizationId: "org1", EnabledLanguages: []string{"en"},
+	})
+
+	res := run(t, home, apiEnv(api), "project", "use", "t2")
+	if res.exitCode != 0 {
+		t.Fatalf("exit = %d, stderr = %q", res.exitCode, res.stderr)
+	}
+	if len(api.RequestsTo("GET", "/tenants/t2")) != 1 {
+		t.Fatalf("want a validating GET /tenants/t2, got %+v", api.Requests())
+	}
+	if creds := loadCredentials(t, home); creds["tenant_id"] != "t2" {
+		t.Fatalf("tenant_id = %q, want t2", creds["tenant_id"])
+	}
+}
+
+func TestProjectUseByIdRejectsUnknownProject(t *testing.T) {
+	home := t.TempDir()
+	seedCredentials(t, home, "at1", "rt1", "t1")
+	api := mockapi.New()
+	defer api.Close()
+
+	res := run(t, home, apiEnv(api), "project", "use", "ghost")
+	if res.exitCode == 0 {
+		t.Fatal("expected nonzero exit for an unknown project id")
+	}
+	if !strings.Contains(res.stderr, "not found or not accessible") {
+		t.Fatalf("stderr = %q, want 'not found or not accessible'", res.stderr)
+	}
+	if creds := loadCredentials(t, home); creds["tenant_id"] != "t1" {
+		t.Fatalf("tenant_id = %q, want it unchanged at t1", creds["tenant_id"])
+	}
+}
+
 func TestNonInteractiveMissingArgFails(t *testing.T) {
 	home := t.TempDir()
 	api := mockapi.New()
